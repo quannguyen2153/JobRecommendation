@@ -137,26 +137,25 @@ class VNWJobInfoCrawler():
         
         return job_info_dict
     
-    def crawlJobInformation(self, joblist_path, output_dir):
+    def crawlJobInformation(self, joblist_path, output_dir, job_idx=1):
         df = pd.read_json(joblist_path, encoding="utf-8")
         
         jobs = []
 
-        job_count = 1
-        for url in df['job_url']:
+        for url in df['job_url'][job_idx-1:]:
             # breaking_time = random.randint(1, 3)
             
             try:
                 job = self.extractFullJobInformation(url)
                 jobs.append(job)
-                print('Complete crawling job {}: {}.'.format(job_count, job['title']))
+                print('Crawled job {}: {} from {}.'.format(job_idx, job['title'], job['company']))
             except:
-                print('Job {} has been removed.'.format(job_count))
-                print('Job {}\'s url: {}.'.format(job_count, url))
-                traceback.print_exc()    
+                print('Job {} has been removed.'.format(job_idx))
+                print('Job {}\'s url: {}.'.format(job_idx, url))
+                traceback.print_exc()
             
-            if job_count % 500 == 0:
-                json_file = 'vnw_jobinfo_{}.json'.format(job_count)
+            if job_idx % 500 == 0:
+                json_file = 'vnw_jobinfo_{}.json'.format(job_idx)
                 output_path = os.path.join(output_dir, json_file)
                 
                 with open(output_path, "w", encoding="utf-8") as file:
@@ -164,7 +163,7 @@ class VNWJobInfoCrawler():
                 print('Wrote 1000 jobs to {}.'.format(json_file))
                 jobs = []
             
-            job_count += 1
+            job_idx += 1
             
             # print('Breaking time: {}...'.format(breaking_time))
             # time.sleep(breaking_time)
@@ -175,6 +174,7 @@ if __name__ == "__main__":
     
     vnw_jobinfo_crawler = VNWJobInfoCrawler(driver=driver)
     vnw_jobinfo_crawler.crawlJobInformation(joblist_path='vietnamworks/rawdata/joblist/vnw_joblist_full.json',
-                                            output_dir='vietnamworks/rawdata/jobinfo/segments')
+                                            output_dir='vietnamworks/rawdata/jobinfo/segments',
+                                            job_idx=3001)
     
     driver.quit()
