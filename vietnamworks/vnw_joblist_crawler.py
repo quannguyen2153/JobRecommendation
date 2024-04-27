@@ -98,12 +98,12 @@ class VNWJobListCrawler():
                     
                     with open(output_path, "w", encoding="utf-8") as file:
                         json.dump(job_info_list, file, indent=4, ensure_ascii=False)
-                    print('Writed 50 job pages to {}.'.format(json_file))
+                    print('Wrote 50 job pages to {}.'.format(json_file))
                     
                     job_info_list = []
                 
                 breaking_time = random.randint(int(timeout/2), timeout)
-                print('Breaking time: {}'.format(breaking_time))
+                print('Breaking time: {}...'.format(breaking_time))
                 time.sleep(breaking_time)
                 
                 page += 1
