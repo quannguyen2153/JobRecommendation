@@ -15,11 +15,10 @@ import traceback
 
 
 class VNWJobListCrawler():
-    def __init__(self, sorting, service, driver) -> None:
+    def __init__(self, sorting, driver) -> None:
         self.sorting = sorting
         self.org_url = "https://www.vietnamworks.com/viec-lam?sorting={}".format(self.sorting)
         
-        self.service = service
         self.driver = driver
     
     def extractJobInformation(self, job_element):
@@ -124,7 +123,7 @@ if __name__ == '__main__':
     service = Service(executable_path="vietnamworks/drivers/chromedriver.exe")
     driver = webdriver.Chrome(service=service)
     
-    vnw_joblist_crawler = VNWJobListCrawler(sorting='lasted', service=service, driver=driver)
-    vnw_joblist_crawler.crawlJobList(output_dir='vietnamworks/rawdata', page=1, timeout=5)
+    vnw_joblist_crawler = VNWJobListCrawler(sorting='lasted', driver=driver)
+    vnw_joblist_crawler.crawlJobList(output_dir='vietnamworks/rawdata/joblist/segments', page=1, timeout=5)
     
     driver.quit()
