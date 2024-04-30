@@ -4,9 +4,16 @@ import json
 
 from googletrans import Translator
 
+import re
+from datetime import datetime, timedelta
+
 class VNWDataProcessor():
     def __init__(self) -> None:
         self.translator = Translator()
+        
+    def save(self, df, output_path):
+        df.to_json(output_path, orient="records", indent=4, force_ascii=False)
+        print('Wrote {} jobs to {}.'.format(df.shape[0], output_path))
         
     def mergeJobSegments(self, job_segments_dir, output_path, drop_duplicates=False):
         dfs = []
@@ -21,14 +28,17 @@ class VNWDataProcessor():
         if drop_duplicates:
             merged_df = merged_df.drop_duplicates()
         
-        merged_df.to_json(output_path, orient="records", indent=4, force_ascii=False)
-        print('Wrote {} jobs to {}.'.format(merged_df.shape[0], output_path))
+        self.save(df=merged_df, output_path=output_path)
         
-    def translateText(self, text, src_lng, dst_lng):
-        if len(text.strip()) == 0 or self.translator.detect(text).lang == dst_lng:
-            return text
-        
-        return self.translator.translate(text, src=src_lng, dest=dst_lng).text
+    def translateText(self, text, src_lng, dst_lng, retries=5):
+        for i in range(retries):
+            try:
+                if len(text.strip()) == 0 or self.translator.detect(text).lang == dst_lng:
+                    return text
+                
+                return self.translator.translate(text, src=src_lng, dest=dst_lng).text
+            except:
+                continue
     
     def translateTextList(self, text_list, src_lng, dst_lng):
         return [self.translateText(text, src_lng, dst_lng) for text in text_list]
@@ -38,6 +48,7 @@ class VNWDataProcessor():
         
         for column in jobinfo_df.columns:
             if column == 'post_date' or column == 'location' or column == 'company' or column == 'contact':
+                translated_df[column] = jobinfo_df[column]
                 print('Skipped {}.'.format(column))
                 continue
             
@@ -50,6 +61,22 @@ class VNWDataProcessor():
             translated_df[column] = translated_column
             
         return translated_df
+    
+    def calculateEndDate(self, jobinfo_df):
+        def extractDays(end_date_str):
+            days = re.search(r'(\d+)\s+day', end_date_str)
+            if days:
+                return int(days.group(1))
+            else:
+                return 0
+            
+        def calculateEndDate(end_date_str):
+            days = extractDays(end_date_str)
+            return (datetime.today() + timedelta(days=days)).strftime('%d/%m/%Y')
+        
+        jobinfo_df['end_date'] = jobinfo_df['end_date'].apply(calculateEndDate)
+        
+        return jobinfo_df
 
         
 if __name__ == '__main__':
@@ -57,8 +84,10 @@ if __name__ == '__main__':
     # vnw_data_processor.mergeJobSegments(job_segments_dir='vietnamworks/rawdata/jobinfo/segments',
     #                                 output_path='vietnamworks/rawdata/jobinfo/vnw_jobinfo_full.json')
     
-    df = pd.read_json('vietnamworks/rawdata/jobinfo/segments/vnw_jobinfo_500.json', encoding="utf-8")
+    df = pd.read_json('vietnamworks/rawdata/jobinfo/translated_jobinfo.json', encoding="utf-8")
     
-    translated_df = vnw_data_processor.translateJobInfo(df, 'auto', 'en')
+    # translated_df = vnw_data_processor.translateJobInfo(df, 'auto', 'en')
     
-    print(translated_df.iloc[:5])
+    # vnw_data_processor.save(df=translated_df, output_path='vietnamworks/rawdata/jobinfo/translated_jobinfo_500.json')
+    df = vnw_data_processor.calculateEndDate(jobinfo_df=df)
+    vnw_data_processor.save(df=df, output_path='vietnamworks/rawdata/jobinfo/preprocessed_jobinfo.json')

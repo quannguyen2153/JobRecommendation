@@ -137,7 +137,7 @@ class VNWJobInfoCrawler():
         
         return job_info_dict
     
-    def crawlJobInformation(self, joblist_path, output_dir, job_idx=1):
+    def crawlJobInformation(self, joblist_path, output_dir, job_idx=1, save_steps=500):
         df = pd.read_json(joblist_path, encoding="utf-8")
         
         jobs = []
@@ -154,13 +154,13 @@ class VNWJobInfoCrawler():
                 print('Job {}\'s url: {}.'.format(job_idx, url))
                 traceback.print_exc()
             
-            if job_idx % 500 == 0:
+            if job_idx % save_steps == 0:
                 json_file = 'vnw_jobinfo_{}.json'.format(job_idx)
                 output_path = os.path.join(output_dir, json_file)
                 
                 with open(output_path, "w", encoding="utf-8") as file:
                     json.dump(jobs, file, indent=4, ensure_ascii=False)
-                print('Wrote 1000 jobs to {}.'.format(json_file))
+                print('Wrote {} jobs to {}.'.format(save_steps, json_file))
                 jobs = []
             
             job_idx += 1
@@ -175,6 +175,6 @@ if __name__ == "__main__":
     vnw_jobinfo_crawler = VNWJobInfoCrawler(driver=driver)
     vnw_jobinfo_crawler.crawlJobInformation(joblist_path='vietnamworks/rawdata/joblist/vnw_joblist_full.json',
                                             output_dir='vietnamworks/rawdata/jobinfo/segments',
-                                            job_idx=3001)
+                                            job_idx=1)
     
     driver.quit()
