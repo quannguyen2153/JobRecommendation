@@ -15,9 +15,14 @@ import traceback
 
 
 class VNWJobListCrawler():
-    def __init__(self, sorting, driver) -> None:
+    def __init__(self, profession, sorting, driver) -> None:
+        self.profession = profession
         self.sorting = sorting
-        self.org_url = "https://www.vietnamworks.com/viec-lam?sorting={}".format(self.sorting)
+        
+        if profession is None:
+            self.org_url = "https://www.vietnamworks.com/viec-lam?sorting={}".format(self.sorting)
+        else:
+            self.org_url = "https://www.vietnamworks.com/viec-lam?g={}&sorting={}".format(self.profession, self.sorting)
         
         self.driver = driver
     
@@ -31,6 +36,7 @@ class VNWJobListCrawler():
             'location': ''
         }
         
+        # Locate and extract the job title and url
         icon = job_element.find_element(By.XPATH, ".//*") \
                         .find_element(By.XPATH, ".//*") \
                         .find_element(By.XPATH, ".//*")
@@ -43,6 +49,7 @@ class VNWJobListCrawler():
         job_info['job_url'] = title.get_attribute("href")
         job_info['title'] = title.text
             
+        # Locate and extract the company name and url
         company_element = title_element.find_element(By.XPATH, "following-sibling::*").find_element(By.XPATH, "following-sibling::*")
         try:
             company = company_element.find_element(By.XPATH, ".//a[@href]")
@@ -52,6 +59,7 @@ class VNWJobListCrawler():
 
         job_info['company'] = company.text
             
+        # Locate and extract the salary and location
         salary_location_element = company_element.find_element(By.XPATH, "following-sibling::*")
         salary_location = salary_location_element.find_elements(By.XPATH, ".//span")
 
@@ -60,17 +68,28 @@ class VNWJobListCrawler():
         
         return job_info
     
-    def crawlJobList(self, output_dir, page=1, timeout=5):
+    def crawlJobList(self, output_dir, page=1, save_steps=50, timeout=5):
         job_info_list = []
         
+        # Crawl until reached the end of vietnamworks job list
         while True:    
             try:
+                # Open the job list page
                 if page <= 1:
                     page = 1
                     self.driver.get(self.org_url)
                 else:
-                    self.driver.get("https://www.vietnamworks.com/viec-lam?page={}&sorting={}".format(page, self.sorting))
+                    if self.profession is None:
+                        url = "https://www.vietnamworks.com/viec-lam?page={}&sorting={}".format(page, self.sorting)
+                    else:
+                        url = "https://www.vietnamworks.com/viec-lam?g={}&page={}&sorting={}" \
+                              .format(self.profession, page, self.sorting)
+                              
+                    self.driver.get(url)
+                    
+                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 
+                # Loop through each job card (there are 50 cards per page)
                 for i in range(50):
                     job_selector = ".search_list.view_job_item.item-{}.new-job-card".format(i)
 
@@ -91,13 +110,14 @@ class VNWJobListCrawler():
                     
                 print('--------------- Complete crawling jobs at page {} ---------------'.format(page))
 
-                if page % 50 == 0:
+                # Write the job list to json after every save_steps
+                if page % save_steps == 0:
                     json_file = 'vnw_joblist_{}.json'.format(page)
                     output_path = os.path.join(output_dir, json_file)
                     
                     with open(output_path, "w", encoding="utf-8") as file:
                         json.dump(job_info_list, file, indent=4, ensure_ascii=False)
-                    print('Wrote 50 job pages to {}.'.format(json_file))
+                    print('Wrote {} job pages to {}.'.format(save_steps, json_file))
                     
                     job_info_list = []
                 
@@ -110,6 +130,7 @@ class VNWJobListCrawler():
             except:
                 traceback.print_exc()
                 
+                # Write the job list if encounter errors
                 json_file = 'vnw_joblist_{}.json'.format(page)
                 output_path = os.path.join(output_dir, json_file)
                 
@@ -123,7 +144,7 @@ if __name__ == '__main__':
     service = Service(executable_path="vietnamworks/drivers/chromedriver.exe")
     driver = webdriver.Chrome(service=service)
     
-    vnw_joblist_crawler = VNWJobListCrawler(sorting='lasted', driver=driver)
+    vnw_joblist_crawler = VNWJobListCrawler(profession=None, sorting='lasted', driver=driver)
     vnw_joblist_crawler.crawlJobList(output_dir='vietnamworks/rawdata/joblist/segments', page=1, timeout=5)
     
     driver.quit()

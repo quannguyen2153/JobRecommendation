@@ -16,6 +16,18 @@ class VNWDataProcessor():
         df.to_json(output_path, orient="records", indent=4, force_ascii=False)
         print('Wrote {} jobs to {}.'.format(df.shape[0], output_path))
         
+    def checkLanguages(self, file_path, output_path):
+        def detectLanguage(text):
+            time.sleep(1)
+            detected_lang = self.translator.detect(text).lang
+            print(detected_lang)
+            return detected_lang
+        
+        df = pd.read_json(file_path, encoding="utf-8")
+        df['lang'] = df['title'].apply(lambda x: detectLanguage(x))
+        
+        self.save(df=df, output_path=output_path)
+        
     def mergeJobSegments(self, job_segments_dir, output_path, drop_duplicates=False):
         dfs = []
         for filename in os.listdir(job_segments_dir):
@@ -30,6 +42,62 @@ class VNWDataProcessor():
             merged_df = merged_df.drop_duplicates()
         
         self.save(df=merged_df, output_path=output_path)
+        
+    def restructureJobInfo(self, jobinfo_path, output_path):
+        df = pd.read_json(jobinfo_path, encoding="utf-8")
+        
+        # Merge requirements with skills
+        df['requirements'] = df['requirements'] + '\n' + df['skills']
+        
+        # Rename columns
+        name_map = {
+            'title': 'job_title',
+            'company': 'company_name',
+            'end_date': 'due_date',
+            'profession': 'fields',
+            'pos_rank': 'position',
+            'experienced_year': 'experience'
+        }        
+        df.rename(columns=name_map, inplace=True)
+        
+        # Drop unnecessary columns
+        dropped_columns = ['field', 'skills', 'profile_language', 'nationality', 'tags']
+        df.drop(columns=dropped_columns, inplace=True)
+        
+        # Reorder columns
+        column_order = ['job_title', 'job_url', 'company_name', 'company_url', 'location', 'post_date', 'due_date',
+                        'fields', 'salary', 'experience', 'position', 'benefits', 'job_description', 'requirements']
+        df = df[column_order]
+        
+        # Calculate due date and convert post_date to timestamp
+        def extractRemainingTime(due_date_str):
+            matches = re.findall(r'(\d+)\s+(tháng|ngày|giờ)', due_date_str)
+
+            if matches:
+                quantity, unit = matches[0]
+                if unit == 'tháng':
+                    months_remaining = int(quantity)
+                    return months_remaining * 30
+                if unit == 'ngày':
+                    days_remaining = int(quantity)
+                    return days_remaining
+                elif unit == 'giờ':
+                    hours_remaining = int(quantity)
+                    return 0
+            else:
+                print("No number of months or days or hours found in the due_date string.")
+                
+        df['due_date'] = df['due_date'].apply(lambda x: \
+            (datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(extractRemainingTime(x))).timestamp())
+        
+        df['post_date'] = df['post_date'].apply(lambda x: \
+            datetime.strptime(x, "%d/%m/%Y").timestamp())
+        
+        # Convert empty experience values to null
+        df['experience'] = df['experience'].apply(lambda x: x if x != 'Không hiển thị' else None)
+        
+        # Save jobinfo dataframe
+        self.save(df=df, output_path=output_path)
         
     def translateText(self, org_text, src_lng, dst_lng, retries=5, truncation_length=30):
         def truncateText(text):
@@ -112,13 +180,14 @@ class VNWDataProcessor():
         
 if __name__ == '__main__':
     vnw_data_processor = VNWDataProcessor()
-    # vnw_data_processor.mergeJobSegments(job_segments_dir='vietnamworks/rawdata/jobinfo/segments',
-    #                                 output_path='vietnamworks/rawdata/jobinfo/vnw_jobinfo_full.json')
     
-    df = pd.read_json('vietnamworks/rawdata/jobinfo/segments/vnw_jobinfo_500.json', encoding="utf-8")
+    job_segments_dir='vietnamworks/rawdata/jobinfo/segments'
+    jobinfo_path='vietnamworks/rawdata/jobinfo/vnw_jobinfo_full.json'
+    preprocessed_jobinfo_path='vietnamworks/data/vnw_jobinfo_full.json'
     
-    translated_df = vnw_data_processor.translateJobInfo(df, 'auto', 'en')    
-    vnw_data_processor.save(df=translated_df, output_path='vietnamworks/rawdata/jobinfo/translated_jobinfo_500.json')
+    # vnw_data_processor.mergeJobSegments(job_segments_dir=job_segments_dir,
+    #                                 output_path=jobinfo_path,
+    #                                 drop_duplicates=False)
     
-    # df = vnw_data_processor.calculateEndDate(jobinfo_df=df)
-    # vnw_data_processor.save(df=df, output_path='vietnamworks/rawdata/jobinfo/preprocessed_jobinfo.json')
+    vnw_data_processor.restructureJobInfo(jobinfo_path=jobinfo_path, output_path=preprocessed_jobinfo_path)
+    

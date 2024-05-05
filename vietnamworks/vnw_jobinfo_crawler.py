@@ -19,8 +19,9 @@ class VNWJobInfoCrawler():
     def __init__(self, driver) -> None:
         self.driver = driver
         
-    def extractFullJobInformation(self, url):
-        self.driver.get(url)
+    def extractFullJobInformation(self, job_url, company_url):
+        # Open the job website
+        self.driver.get(job_url)
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -43,9 +44,11 @@ class VNWJobInfoCrawler():
             'location': '',
             'tags': [],
             'company': '',
-            'contact': [url]
+            'job_url': job_url,
+            'company_url': company_url
         }
         
+        # Click button to view full job details
         try:
             full_view_button = WebDriverWait(self.driver, 5).until(
                 EC.presence_of_element_located((By.XPATH, "//button[@aria-label='Xem đầy đủ mô tả công việc']"))
@@ -67,18 +70,22 @@ class VNWJobInfoCrawler():
 
         rows = self.driver.find_elements(By.ID, "vnwLayout__row")
 
+        # Extract the job title
         title = rows[4].find_element(By.XPATH, ".//h1")
         title = title.text
         job_info_dict['title'] = title
 
+        # Extract the salary
         salary = rows[5].find_element(By.XPATH, ".//span")
         salary = salary.text
         job_info_dict['salary'] = salary
 
+        # Extract the end date
         end_date = rows[6].find_element(By.XPATH, ".//span")
         end_date = end_date.text
         job_info_dict['end_date'] = end_date
 
+        # Extract the job description and requirements
         job_info = rows[8].find_elements(By.XPATH, "//h2")
 
         job_description = job_info[0].find_element(By.XPATH, "following-sibling::*")
@@ -89,10 +96,12 @@ class VNWJobInfoCrawler():
         requirements = requirements.text
         job_info_dict['requirements'] = requirements
 
+        # Extract the benefits
         benefits = rows[9].find_elements(By.ID, "vnwLayout__col")
         for benefit in benefits:
             job_info_dict['benefits'].append(benefit.text)
             
+        # Extract the job extra info
         job_extra_info = rows[11].find_elements(By.ID, "vnwLayout__col")
 
         col0 = job_extra_info[0].find_element(By.NAME, "paragraph")
@@ -121,14 +130,17 @@ class VNWJobInfoCrawler():
         job_info_dict['experienced_year'] = experienced_year
         job_info_dict['nationality'] = nationality
 
+        # Extract the location
         location = rows[13].find_element(By.NAME, "paragraph")
         location = location.text
         job_info_dict['location'] = location
 
+        # Extract the tags
         tags = rows[14].find_elements(By.ID, "vnwLayout__col")[1].find_elements(By.XPATH, ".//span")
         for tag in tags:
             job_info_dict['tags'].append(tag.text)
             
+        # Extract the company name
         company = rows[2].find_element(By.ID, "vnwLayout__col") \
                         .find_element(By.XPATH, "following-sibling::*") \
                         .find_element(By.NAME, "label")
@@ -138,22 +150,25 @@ class VNWJobInfoCrawler():
         return job_info_dict
     
     def crawlJobInformation(self, joblist_path, output_dir, job_idx=1, save_steps=500):
+        # Read the job list json to get jobs url and companies url
         df = pd.read_json(joblist_path, encoding="utf-8")
         
         jobs = []
 
-        for url in df['job_url'][job_idx-1:]:
-            # breaking_time = random.randint(1, 3)
+        for index, row in df.iloc[job_idx:].iterrows():
+            job_url = row['job_url']
+            company_url = row['company_url']
             
             try:
-                job = self.extractFullJobInformation(url)
+                job = self.extractFullJobInformation(job_url, company_url)
                 jobs.append(job)
                 print('Crawled job {}: {} from {}.'.format(job_idx, job['title'], job['company']))
             except:
                 print('Job {} has been removed.'.format(job_idx))
-                print('Job {}\'s url: {}.'.format(job_idx, url))
+                print('Job {}\'s url: {}.'.format(job_idx, job_url))
                 traceback.print_exc()
             
+            # Save the jobs info every save_steps
             if job_idx % save_steps == 0:
                 json_file = 'vnw_jobinfo_{}.json'.format(job_idx)
                 output_path = os.path.join(output_dir, json_file)
@@ -165,8 +180,12 @@ class VNWJobInfoCrawler():
             
             job_idx += 1
             
-            # print('Breaking time: {}...'.format(breaking_time))
-            # time.sleep(breaking_time)
+        json_file = 'vnw_jobinfo_{}.json'.format(job_idx-1)
+        output_path = os.path.join(output_dir, json_file)
+        
+        with open(output_path, "w", encoding="utf-8") as file:
+            json.dump(jobs, file, indent=4, ensure_ascii=False)
+        print('Wrote remaining jobs to {}.'.format(json_file))
         
 if __name__ == "__main__":
     service = Service(executable_path="vietnamworks/drivers/chromedriver.exe")
@@ -176,5 +195,6 @@ if __name__ == "__main__":
     vnw_jobinfo_crawler.crawlJobInformation(joblist_path='vietnamworks/rawdata/joblist/vnw_joblist_full.json',
                                             output_dir='vietnamworks/rawdata/jobinfo/segments',
                                             job_idx=1)
+    # print(vnw_jobinfo_crawler.extractFullJobInformation('https://www.vietnamworks.com/marketing-executive--1764069-jv?source=searchResults&searchType=2&placement=1764069&sortBy=date', 'None'))
     
     driver.quit()
