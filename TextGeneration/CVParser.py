@@ -43,7 +43,18 @@ class CVParser():
 
         return cv_extraction_output
     
+    def cleanText(self, text):
+        match = re.search(r'\w+\b', text[::-1])
+        if match:
+            last_word_index = len(text) - match.start()
+            last_punctuation = text[last_word_index]
+            return text[:last_word_index].rstrip(".,!?;:-\'\"") + last_punctuation
+        else:
+            return text.rstrip(".,!?;:-")
+    
     def convertToDict(self, cv_info_text):
+        cv_info_text = cv_info_text + '\n' + '* End.'
+        
         cv_dict = dict.fromkeys(self.cv_fields)
 
         for field in self.cv_fields:
@@ -54,7 +65,7 @@ class CVParser():
 
         return cv_dict
     
-    def parseFromPDF(self, cv_pdf_path):
+    def parseFromPDF(self, cv_pdf_path, clean=True, max_new_tokens=1000):
         pages = []
         with open(cv_pdf_path, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
@@ -65,6 +76,9 @@ class CVParser():
 
         cv_raw_text = '\n'.join(pages)
 
-        cv_info_text = self.extractInformation(cv_raw_text=cv_raw_text)
+        cv_info_text = self.extractInformation(cv_raw_text=cv_raw_text, max_new_tokens=max_new_tokens)
+        
+        if clean:
+            cv_info_text = self.cleanText(text=cv_info_text)
         
         return cv_info_text
