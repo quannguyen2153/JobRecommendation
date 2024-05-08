@@ -7,7 +7,6 @@ class UserSerializer(serializers.Serializer):
   uid = serializers.CharField()
   email = serializers.EmailField()
   username = serializers.CharField()
-  cv_filename = serializers.CharField(default=None)
   created_at = serializers.DateTimeField(default=datetime.now())
   modified_at = serializers.DateTimeField(default=None)
   deleted = serializers.BooleanField(default=False)

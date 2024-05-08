@@ -5,7 +5,8 @@ import json
 
 from .firebase import firebase_client
 from .serializers import UserSerializer
-from .database import UserManager
+from .database import UserManager, UserResourceManager
+from .utils import authorization_required
 
 def home(request):
   return HttpResponse("Hello!")
@@ -84,3 +85,35 @@ class SignInView(View):
     }, status=200)
     response.headers['Set-Cookie'] = f"idToken={result['idToken']};refreshToken={result['refreshToken']};"
     return response
+
+class UserCVView(View):
+  '''
+  Upload and get user's own CV
+  '''
+
+  @authorization_required
+  def get(self, request, user=None, id_token=None):
+    try:
+      download_url = UserResourceManager.get_url("cv.pdf", user.uid, id_token)
+    except Exception as e:
+      return JsonResponse({"success": False, "message": str(e)}, status=400)
+    
+    if download_url is None:
+      return JsonResponse({"success": False, 
+                           "message": "CV file not found."}, 
+                          status=404)
+    return JsonResponse({"success": True, 
+                         "message": "Get CV successfully.",
+                         "data": {"download_url": download_url}}, 
+                        status=200)
+
+  @authorization_required
+  def post(self, request, user=None, id_token=None):
+    try:
+      if 'file' not in request.FILES:
+        raise Exception("No file uploaded.")
+      cv_file = request.FILES['file']
+      UserResourceManager.upload_file("cv.pdf", cv_file, user.uid, id_token)
+    except Exception as e:
+      return JsonResponse({"success": False, "message": str(e)}, status=400)
+    return JsonResponse({"success": True, "message": "File uploaded successfully."}, status=200)
