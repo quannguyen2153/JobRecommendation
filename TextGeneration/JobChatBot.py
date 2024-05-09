@@ -9,19 +9,31 @@ class JobChatBot():
         self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
         
     def attachJob(self, job_dict):
-        self.job = job_dict
+        self.job = job_dict        
+        self.job_requirements = self.job['requirements']
+        
+        tokens = self.tokenizer.tokenize(self.job_requirements)
+        self.job_requirements_tokens = len(tokens)
         
     def attachCV(self, cv_dict):
-        self.cv = cv_dict
-        extract_keys=['profession', 'address', 'skills', 'experiences', 'education', 'certificates']
-        self.cv_text = self.extractCVDictToText(extract_keys=extract_keys)
+        self.cv = cv_dict        
+        self.cv_text = self.extractCVDictToText()
         
-    def extractCVDictToText(self, extract_keys):
+        tokens = self.tokenizer.tokenize(self.cv_text)
+        self.cv_tokens = len(tokens)
+        
+    def extractCVDictToText(self):
+        extract_keys=['Candidate\'s Profession',
+                      'Candidate\'s Date of Birth',
+                      'Candidate\'s Address',
+                      'Candidate\'s Skills',
+                      'Candidate\'s Experiences',
+                      'Candidate\'s Education',
+                      'Candidate\'s Certificates']
         extracted_cv_dict = {}
         
-        for cv_dict_key in self.cv.keys():
-            if any(key.lower() in cv_dict_key.lower() for key in extract_keys):
-                extracted_cv_dict[cv_dict_key] = self.cv[cv_dict_key]
+        for key in extract_keys:
+            extracted_cv_dict[key] = self.cv[key]
                 
         cv_text = ''
         for key, value in extracted_cv_dict.items():
@@ -38,20 +50,18 @@ class JobChatBot():
         return cv_text
         
     def query(self, message):
-        info_message = 'Candidate\'s CV:\n' + self.cv_text + '\n---\nJob Requirements:\n' + self.job
+        info_message = 'Candidate\'s CV:\n' + self.cv_text + '\n---\nJob Requirements:\n' + self.job_requirements
         request_message = info_message + '\n---\n' + message
-        
-        tokens = self.tokenizer.tokenize(request_message)
-        num_tokens = len(tokens)
         
         payload = {
             "inputs": request_message,
             "parameters": {
-                # "max_new_tokens": 1000,
+                "max_new_tokens": self.job_requirements_tokens + self.cv_tokens,
+                "repetition_penalty": 1,
                 "return_full_text": False
             }
         }
         
         response = self.text_generator.query(payload=payload)
 
-        return response
+        return response.strip()
