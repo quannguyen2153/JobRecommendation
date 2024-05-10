@@ -1,4 +1,4 @@
 JobRecommendation/*
-api_web_service/config.py 
+api/config.py 
 firebase-credential.json
 */__pycache__/*
