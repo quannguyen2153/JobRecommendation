@@ -3,6 +3,7 @@ from . import views
 
 user_urls = [
   path('cv/', views.UserCVView.as_view()),
+  path('avatar/', views.UserAvatarView.as_view()),
 ]
 
 api_urls = [

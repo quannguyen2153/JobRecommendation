@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import json
@@ -178,3 +179,23 @@ class UserCVView(APIView):
       "success": True, 
       "message": "File uploaded successfully."
     })
+  
+class UserAvatarView(APIView):
+  '''
+  Get user's own avatar
+  '''
+  http_method_names = ['get']
+  authentication_classes = [FirebaseAuthentication]
+
+  def get(self, request):
+    try:
+      download_url = UserResourceManager.get_url("avatar.svg", request.user.uid, request.auth)
+      return HttpResponseRedirect(download_url)
+    except Exception as e:
+      return Response(
+        data = {
+          "success": False, 
+          "message": str(e)
+        }, 
+        status=400
+      )

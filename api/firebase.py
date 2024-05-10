@@ -4,6 +4,7 @@ import requests
 from .config import FIREBASE_CONFIG
 from .models import *
 from .serializers import *
+from .utils import generate_avatar
 
 firebase_client = pyrebase.initialize_app(FIREBASE_CONFIG)
 
@@ -90,6 +91,10 @@ class AuthHelper:
       "username": username,
     }).create()
     UserManager.create(user)
+    
+    # Generate avatar for new user
+    avatar = generate_avatar().encode()
+    UserResourceManager.upload_file("avatar.svg", avatar, result['localId'], result['idToken'])
   
   @staticmethod
   def sign_in(email, password):
@@ -113,15 +118,12 @@ class AuthHelper:
   def verify_token(id_token):
     """
     Verify id token, then refresh user session
-    Return: user object if token is valid, None otherwise
+    Return: user object if token is valid, raise exception otherwise
     """
-    try:
-      user_id = auth_client.get_account_info(id_token)['users'][0]['localId']
-      refresh_token = SessionDataManager.get_refresh_token(id_token)
-      auth_client.refresh(refresh_token)
-      return UserManager.get(user_id)
-    except:
-      return None
+    user_id = auth_client.get_account_info(id_token)['users'][0]['localId']
+    refresh_token = SessionDataManager.get_refresh_token(id_token)
+    auth_client.refresh(refresh_token)
+    return UserManager.get(user_id)
     
   @staticmethod
   def forgot_password(email):
