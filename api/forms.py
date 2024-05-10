@@ -9,3 +9,5 @@ class SignInForm(forms.Form):
   email = forms.EmailField()
   password = forms.CharField()
 
+class ForgotPasswordForm(forms.Form):
+  email = forms.EmailField()

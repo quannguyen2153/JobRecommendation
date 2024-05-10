@@ -122,3 +122,11 @@ class AuthHelper:
       return UserManager.get(user_id)
     except:
       return None
+    
+  @staticmethod
+  def forgot_password(email):
+    """
+    Send reset password email to user
+    """
+    auth_client.send_password_reset_email(email)
+    return

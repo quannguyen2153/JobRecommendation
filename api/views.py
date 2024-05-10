@@ -89,6 +89,45 @@ class SignInView(APIView):
       }, 
     )
 
+class ForgotPasswordView(APIView):
+  '''
+  Send password reset email to user
+  '''
+  http_method_names = ['post']
+
+  def post(self, request):
+    # Get data from request
+    try:
+      form = ForgotPasswordForm(json.loads(request.body))
+      if not form.is_valid():
+        raise Exception(form.errors.as_data())
+    except Exception as e:
+      return Response(
+        data={
+          "success": False, 
+          "message": str(e)
+        }, 
+        status=400
+      )
+    
+    # Send password reset email
+    try:
+      AuthHelper.forgot_password(form.data['email'])
+    except Exception as e:
+      return Response(
+        data={
+          "success": False, 
+          "message": str(e)
+        }, 
+        status=500
+      )
+    return Response(
+      data={
+        "success": True, 
+        "message": "Password reset email sent successfully."
+      }, 
+    )
+
 class UserCVView(APIView):
   '''
   Upload and get user's own CV
