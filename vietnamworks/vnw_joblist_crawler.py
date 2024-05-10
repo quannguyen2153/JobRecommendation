@@ -26,21 +26,44 @@ class VNWJobListCrawler():
         
         self.driver = driver
     
-    def extractJobInformation(self, job_element):
+    def extractJobInformation(self, job_element, timeout=5):
         job_info = {
             'title': '',
             'job_url': '',
             'company': '',
             'company_url': '',
+            'company_img_url': '',
             'salary': '',
             'location': ''
         }
         
-        # Locate and extract the job title and url
+        # Locate and extract the company image url 
         icon = job_element.find_element(By.XPATH, ".//*") \
                         .find_element(By.XPATH, ".//*") \
                         .find_element(By.XPATH, ".//*")
+                        
+        class RealImage(object):
+            def __init__(self, locator, substring):
+                self.locator = locator
+                self.substring = substring
+
+            def __call__(self, driver):
+                element = driver.find_element(*self.locator)
+                src = element.get_attribute("src")
+                if self.substring in src:
+                    return element
+                else:
+                    return False
+        
+        img_element = icon.find_element(By.XPATH, ".//img")
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", img_element)    
+        img_element = WebDriverWait(icon, timeout).until(
+            RealImage((By.XPATH, ".//img"), "http")
+        )  
+        img_url = img_element.get_attribute("src")
+        job_info['company_img_url'] = img_url
             
+        # Locate and extract the job title and url
         info = icon.find_element(By.XPATH, "following-sibling::*")
 
         title_element = info.find_element(By.XPATH, ".//*")
@@ -104,7 +127,7 @@ class VNWJobListCrawler():
                             EC.presence_of_element_located((By.CSS_SELECTOR, job_selector))
                         )
 
-                    job_info_list.append(self.extractJobInformation(job))
+                    job_info_list.append(self.extractJobInformation(job, timeout))
                     
                     print('Complete crawling job {} at page {}'.format(i + 1, page))
                     
@@ -145,6 +168,6 @@ if __name__ == '__main__':
     driver = webdriver.Chrome(service=service)
     
     vnw_joblist_crawler = VNWJobListCrawler(profession=None, sorting='lasted', driver=driver)
-    vnw_joblist_crawler.crawlJobList(output_dir='vietnamworks/rawdata/joblist/segments', page=1, timeout=5)
+    vnw_joblist_crawler.crawlJobList(output_dir='vietnamworks/rawdata/joblist/segments2', page=1, timeout=5)
     
     driver.quit()
