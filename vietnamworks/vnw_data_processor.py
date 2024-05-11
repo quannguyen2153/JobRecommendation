@@ -131,6 +131,17 @@ class VNWDataProcessor():
             breaking_time = random.uniform(0.5, 1.5)
             print('Breaking time: {}...'.format(breaking_time))
             time.sleep(breaking_time)
+            
+    def addTranslationToJobInfo(self, jobinfo_path, translation_path, output_path):
+        job_df = pd.read_json(jobinfo_path, encoding="utf-8")
+        translation_df = pd.read_csv(translation_path, encoding="utf-8")
+
+        # Add requirements_language and en_requirements to job_df DataFrame
+        job_df['requirements_language'] = translation_df['requirements_language']
+        job_df['en_requirements'] = translation_df['en_requirements']
+        
+        self.save(df=job_df, output_path=output_path)
+        
 
         
 if __name__ == '__main__':
@@ -142,13 +153,16 @@ if __name__ == '__main__':
     joblist_path='vietnamworks/rawdata/joblist/vnw_joblist_full_url.json'
     url_jobinfo_path='vietnamworks/data/vnw_jobinfo_full_url.json'
     translation_path='vietnamworks/rawdata/translation/job_req_translation.csv'
+    final_jobinfo_path='vietnamworks/data/preprocessed_jobinfo_full.json'
     
     # vnw_data_processor.mergeJobSegments(job_segments_dir=job_segments_dir,
     #                                 output_path=jobinfo_path,
     #                                 drop_duplicates=False)
     
     # vnw_data_processor.restructureJobInfo(jobinfo_path=jobinfo_path, output_path=preprocessed_jobinfo_path)
-    
+     
     # vnw_data_processor.addCompanyImgUrls(jobinfo_path=preprocessed_jobinfo_path, joblist_path=joblist_path, output_path=url_jobinfo_path)
     
-    vnw_data_processor.translateJobRequirements(jobinfo_path=url_jobinfo_path, output_path=translation_path, job_idx=394)
+    # vnw_data_processor.translateJobRequirements(jobinfo_path=url_jobinfo_path, output_path=translation_path, job_idx=9211)
+    
+    vnw_data_processor.addTranslationToJobInfo(jobinfo_path=url_jobinfo_path, translation_path=translation_path, output_path=final_jobinfo_path)
