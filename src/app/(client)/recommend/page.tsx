@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Filter from './Filter';
 import {
   Button,
@@ -11,6 +11,8 @@ import {
 import { AssetSvg } from '@/assets/AssetSvg';
 import JobListItem from './JobListItem';
 import JobDescriptionCard from './JobDescriptionCard';
+import FileCard from '@/components/FileCard/FileCard';
+import { FileDialog } from '@/components/FileDialog';
 
 const sampleJobData = [
   {
@@ -137,23 +139,23 @@ const sampleJobData = [
   },
 ];
 const page = () => {
-  //Set state of fitlers
-  //(If click on filter button, the filter component will be shown
-  //and the state will be set to true, otherwise it will be false)
-  const [showFilter, setShowFilter] = useState(true);
-  //Prevent animation when render new page
-  const [animateFilter, setAnimateFilter] = useState(false);
-  const handleClick = () => {
-    setShowFilter(!showFilter);
-    setAnimateFilter(true);
-  };
+  // //Set state of fitlers
+  // //(If click on filter button, the filter component will be shown
+  // //and the state will be set to true, otherwise it will be false)
+  // const [showFilter, setShowFilter] = useState(true);
+  // //Prevent animation when render new page
+  // const [animateFilter, setAnimateFilter] = useState(false);
+  // const handleClick = () => {
+  //   setShowFilter(!showFilter);
+  //   setAnimateFilter(true);
+  // };
 
-  //Mock data of filters
-  const data = {
-    major: { id: 1 },
-    location: { id: 2 },
-    salaryRange: { id: 3 },
-  };
+  // //Mock data of filters
+  // const data = {
+  //   major: { id: 1 },
+  //   location: { id: 2 },
+  //   salaryRange: { id: 3 },
+  // };
 
   //Pagination params
   const [currentPage, setCurrentPage] = useState(1);
@@ -172,34 +174,112 @@ const page = () => {
     { id: 2, option: 'Oldest' },
   ];
 
-  //Selected job description data
+  // //Selected job description data
   const [selectedJob, setSelectedJob] = useState(sampleJobData[0]);
 
   //Onchange when click item in job list
-  const onJobClick = (job) => {
+  const onJobChose = (job) => {
     setSelectedJob(job);
   };
 
+  //CV state
+  const [cvFile, setCvFile] = useState([]);
+  const [lastModifiedTime, setLastModifiedTime] = useState<Date>();
+
+  useEffect(() => {
+    if (cvFile.length > 0) {
+      const file = cvFile[0];
+      setLastModifiedTime(new Date());
+    }
+  }, [cvFile]);
+
+  //CV modal state
+  const [open, setOpen] = useState(false);
+
+  //Job description modal state
+  const [showJobDescriptionModal, setShowJobDescriptionModal] = useState(false);
+
+  const [chatOpen, setChatOpen] = useState(false);
+
   return (
     <div className="w-full h-full flex flex-col justify-center items-center gap-4">
-      <div className="w-full h-fit flex flex-col justify-center items-center pt-8 gap-4">
-        <p className="text-[#858585]">
-          Upload your CV to find the best jobs for you
-        </p>
+      {cvFile.length == 0 ? (
+        <div className="w-full h-fit flex flex-col justify-center items-center pt-8 gap-4">
+          <p className="text-[#858585]">
+            Upload your CV to find the best jobs for you
+          </p>
 
-        <Button
-          radius="sm"
-          color="primary"
-          size="lg"
-          aria-label="Upload your CV"
-          className="w-[35%] md:w-[25%] lg:w-[20%] xl:w-[15%] text-sm lg:text-large"
-          startContent={AssetSvg.upload()}
-        >
-          Upload your CV
-        </Button>
+          <Button
+            radius="sm"
+            color="primary"
+            size="lg"
+            aria-label="Upload your CV"
+            className="w-[35%] md:w-[25%] lg:w-[20%] xl:w-[15%] text-sm lg:text-large"
+            startContent={AssetSvg.upload()}
+            onClick={() => setOpen(true)}
+          >
+            Upload your CV
+          </Button>
+        </div>
+      ) : (
+        <div className="w-full h-fit flex flex-col items-center justify-center gap-4">
+          {cvFile.length > 0 ? (
+            <div className="w-full h-fit flex flex-col justify-center items-center gap-5 mt-8">
+              <FileCard
+                key={'cv'}
+                files={cvFile}
+                setFiles={setCvFile}
+                file={cvFile[0]}
+              />
+              <div className="w-full h-fit flex flex-row mt-3 text-black justify-center items-center gap-8 font-bold">
+                <span>Chỉnh sửa lần cuối</span>
+                <span>{lastModifiedTime?.toLocaleString()}</span>
+              </div>
+              <div className="w-full h-fit flex flex-row justify-center items-center gap-4">
+                <Button
+                  className={`
+             border-orange w-32 m-4`}
+                  variant="bordered"
+                  radius="sm"
+                  onClick={() => {
+                    setOpen(true);
+                  }}
+                >
+                  Chỉnh sửa
+                </Button>
+                {/* <Button
+                className={`
+                  bg-orange text-white
+             border-orange w-32 m-4`}
+                variant="bordered"
+                radius="sm"
+                onClick={onSubmit}
+              >
+                Lưu
+              </Button> */}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      <div className="flex h-0 w-0 flex-col gap-y-4 justify-center overflow-hidden">
+        <div className="flex flex-row gap-x-4 items-center font-bold ">
+          <FileDialog
+            className="text-black"
+            name="Images"
+            maxFiles={1}
+            maxSize={1024 * 1024 * 4}
+            files={cvFile}
+            setFiles={setCvFile as any}
+            disabled={false}
+            open={open}
+            onOpenChange={() => setOpen(false)}
+          />
+        </div>
       </div>
 
-      <div className="w-full h-fit flex flex-col items-center justify-center gap-5 mt-4">
+      {/* <div className="w-full h-fit flex flex-col items-center justify-center gap-5 mt-4">
         <div className="w-[80%] h-fit flex flex-row items-center gap-5 mt-4">
           <Input
             aria-label="Search for jobs"
@@ -269,7 +349,7 @@ const page = () => {
         >
           <Filter data={data} isOpen={showFilter} />
         </div>
-      </div>
+      </div> */}
 
       <div className="w-full h-fit flex flex-row gap-3 bg-secondary mt-8">
         <div className="w-[50%] h-fit mx-8 my-16 flex flex-col">
@@ -291,7 +371,12 @@ const page = () => {
               aria-label="Filter"
             >
               {filterOptions?.map((c) => (
-                <SelectItem key={c.id} value={c.option} className="text-black">
+                <SelectItem
+                  key={c.id}
+                  value={c.option}
+                  className={`{text-black }`}
+                  onMouseEnter={() => {}}
+                >
                   {c.option}
                 </SelectItem>
               ))}
@@ -309,17 +394,35 @@ const page = () => {
               />
             ) : ( */}
               {
-                <div className="w-full h-fit">
+                <div className="w-full h-fit z-0">
                   {sampleJobData?.map((item) => (
                     <div
                       key={item.job_url}
-                      className="w-full h-fit flex flex-row items-center justify-between my-2"
-                      onClick={() => onJobClick(item)}
+                      className={`w-full h-fit flex flex-row items-center justify-between my-2 relative ${
+                        showJobDescriptionModal &&
+                        selectedJob.job_url === item.job_url
+                          ? 'z-20'
+                          : 'z-0'
+                      }`}
+                      // onClick={() => onJobClick(item)}
+                      onMouseEnter={() => {
+                        setShowJobDescriptionModal(true);
+                        setSelectedJob(item);
+                      }}
+                      onMouseLeave={() => {
+                        setShowJobDescriptionModal(false);
+                      }}
                     >
                       <JobListItem
                         data={item}
                         isSelected={selectedJob.job_url === item.job_url}
-                      />
+                      />{' '}
+                      {showJobDescriptionModal &&
+                        selectedJob.job_url === item.job_url && (
+                          <div className="z-10 absolute -top-16 right-0 w-1/5">
+                            <JobDescriptionCard data={item} />
+                          </div>
+                        )}
                     </div>
                   ))}
                 </div>
@@ -338,9 +441,9 @@ const page = () => {
           ) : null}
         </div>
 
-        <div className="w-[50%] h-full mx-8 my-16">
+        {/* <div className="w-[50%] h-full mx-8 my-16">
           <JobDescriptionCard data={selectedJob}></JobDescriptionCard>
-        </div>
+        </div> */}
       </div>
     </div>
   );

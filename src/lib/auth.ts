@@ -1,27 +1,27 @@
-// import options from '@/app/api/auth/[...nextauth]/options';
-// import { getServerSession } from 'next-auth';
-// import { redirect } from 'next/navigation';
-// import jwt from 'jsonwebtoken';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import jwt from 'jsonwebtoken';
+import options from '@/app/api/auth/[...nextAuth]/options';
 
-// export async function mustBeLoggedIn() {
-//   const session = await getServerSession(options);
-//   console.log('session: ', session);
-//   if (!session || !session?.user?.isEmailVerified) {
-//     redirect('/auth/login');
-//   }
-// }
-// export async function getSession() {
-//   const session = await getServerSession(options);
-//   return session;
-// }
+export async function mustBeLoggedIn() {
+  const session = await getServerSession(options);
+  console.log('session: ', session);
+  if (!session) {
+    redirect('/login');
+  }
+}
+export async function getSession() {
+  const session = await getServerSession(options);
+  return session;
+}
 
-// export async function alreadyLoggedIn() {
-//   const session = await getServerSession(options);
-//   console.log('sessionnnnn: ', session);
-//   if (session && session?.user?.isEmailVerified) {
-//     redirect('/');
-//   }
-// }
+export async function alreadyLoggedIn() {
+  const session = await getServerSession(options);
+  console.log('session: ', session);
+  if (session) {
+    redirect('/');
+  }
+}
 // export async function mustBeLoggedInAndVerified() {
 //   const session = await getServerSession(options);
 //   console.log('session in loginnnnnn');

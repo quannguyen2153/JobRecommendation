@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/Header';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -31,7 +30,6 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       >
         <div className="w-full h-full bg-white">
           {/* <Header session={session} /> */}
-          <Header />
           {children}
         </div>
       </body>

@@ -31,6 +31,10 @@ const config: Config = {
           DEFAULT: '#ef4444',
           foreground: '#fafafa',
         },
+        danger: {
+          DEFAULT: '#ef4444',
+          foreground: '#ef4444',
+        },
         muted: {
           DEFAULT: '#f4f4f5',
           foreground: '#71717a',

@@ -25,7 +25,6 @@ const JobListItem = ({
   };
   isSelected: boolean;
 }) => {
-  console.log('🚀 ~ data:', data);
   return (
     <div
       className={`w-full h-fit rounded-md p-3 flex flex-row items-center justify-around  border-3 ${

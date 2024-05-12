@@ -5,6 +5,7 @@ import { FileDialog } from '@/components/FileDialog';
 import { Button } from '@nextui-org/react';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import Rating from './Rating';
+import ChatbotPopup from '../recommend/ChatbotPopup';
 
 const sampleRatingData = {
   rating: 65.3,
@@ -27,6 +28,8 @@ const page = () => {
 
   //Dialog state
   const [open, setOpen] = useState(false);
+
+  const [chatOpen, setChatOpen] = useState(false);
   return (
     <div className="w-full h-full flex flex-col justify-center items-center gap-4">
       {cvFile.length == 0 ? (
@@ -107,6 +110,23 @@ const page = () => {
 
       <div className="w-full h-fit flex items-center justify-center">
         <Rating data={sampleRatingData}></Rating>
+      </div>
+
+      <div className="w-[25%] h-fit flex flex-row fixed bottom-0 right-0 mr-4">
+        <div className={` ${chatOpen ? 'animate-in duration-200' : 'hidden'}`}>
+          <ChatbotPopup />
+        </div>
+        <Button
+          isIconOnly
+          color="primary"
+          aria-label="Like"
+          radius="full"
+          size="lg"
+          onClick={() => setChatOpen(!chatOpen)}
+          className="mr-4 mb-10"
+        >
+          {AssetSvg.chat()}
+        </Button>
       </div>
     </div>
   );

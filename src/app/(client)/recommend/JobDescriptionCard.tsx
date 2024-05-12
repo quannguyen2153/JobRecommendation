@@ -25,7 +25,10 @@ const JobDescriptionCard = ({
   };
 }) => {
   return (
-    <div className="w-full h-full border-3 rounded-md flex flex-col gap-3 bg-white shadow-md px-6 py-8 text-black">
+    <ScrollShadow
+      hideScrollBar
+      className="w-[660px] z-0 h-[450px] border-3 rounded-md flex flex-col gap-3 bg-white shadow-md text-black p-3"
+    >
       <div className="flex flex-row gap-5 items-center">
         <Image
           className="w-[8%]"
@@ -72,7 +75,7 @@ const JobDescriptionCard = ({
         </Button>
       </div>
 
-      <ScrollShadow hideScrollBar className="w-full h-[550px]">
+      <div className="w-fit h-fit">
         <div className="w-full flex flex-col gap-3">
           <div className="w-full h-fit flex flex-col gap-2">
             <p className="font-bold">Fields</p>
@@ -96,8 +99,8 @@ const JobDescriptionCard = ({
             <p>{data.benefits}</p>
           </div>
         </div>
-      </ScrollShadow>
-    </div>
+      </div>
+    </ScrollShadow>
   );
 };
 
