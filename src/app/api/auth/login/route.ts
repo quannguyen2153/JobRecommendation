@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   if (!body) return new Response('no body', { status: 400 });
   try {
     const response = await postRequest({
-      endPoint: process.env.NEXT_BACKEND_URL + '/signin/',
+      endPoint: process.env.NEXT_PUBLIC_BACKEND_URL + '/signin/',
       formData: body,
       isFormData: false,
     });

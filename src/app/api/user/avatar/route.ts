@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 export async function GET() {
   try {
     const response = await getRequest({
-      endPoint: process.env.NEXT_BACKEND_URL + '/user/avatar/',
+      endPoint: process.env.NEXT_PUBLIC_BACKEND_URL + '/user/avatar/',
     });
     if (response.status == 200) {
       return new Response(

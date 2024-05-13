@@ -5,7 +5,7 @@ export const useUser = () => {
   const onGetAvatar = async (callback) => {
     try {
       const response = await getRequest({
-        endPoint: 'api/user/avatar/',
+        endPoint: '/user/avatar/',
       });
       console.log('🚀 ~ onGetAvatar ~ response:', response);
       callback(response);
