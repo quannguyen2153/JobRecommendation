@@ -4,12 +4,10 @@ import pandas as pd
 
 class JobRecommender():
     def __init__(self) -> None:
-        # self.model = SentenceTransformer("multi-qa-MiniLM-L6-cos-v1") # 0.6s
-        self.model = SentenceTransformer("multi-qa-mpnet-base-dot-v1") # 1.8s
+        self.model = SentenceTransformer("multi-qa-mpnet-base-dot-v1")
         
-    def attachJobs(self, jobs):
-        # Will be modified in the future for integration capability
-        self.job_df = jobs
+    def attachJobs(self, job_df):
+        self.job_df = job_df
         
     def attachCV(self, cv_dict):
         self.cv = cv_dict        
@@ -19,8 +17,6 @@ class JobRecommender():
         
     def extractCVDictToText(self):
         extract_keys=['Candidate\'s Profession',
-                      'Candidate\'s Date of Birth',
-                      'Candidate\'s Address',
                       'Candidate\'s Skills',
                       'Candidate\'s Experiences',
                       'Candidate\'s Education',
@@ -44,15 +40,10 @@ class JobRecommender():
         
         return cv_text
     
-    def computeJobsSimilarity(self, job_df):
-        def computeSimilarity(row):
-            requirements = row['requirements'] if row['requirements_language'] == 'en' else row['en_requirements']
-            
-            requirements_encoded = self.model.encode(requirements)
-                        
-            return util.dot_score(self.cv_text_encoded, requirements_encoded).item()
-
+    def computeJobsSimilarity(self):
         # Compute similarity
-        job_df['similarity'] = job_df.apply(computeSimilarity, axis=1)
+        similarity_job_df = self.job_df.copy(deep=True)
+        similarity_job_df['similarity'] = similarity_job_df['req_vector'] \
+                                            .apply(lambda x: util.dot_score(self.cv_text_encoded, x).item())
         
-        return job_df
+        return similarity_job_df

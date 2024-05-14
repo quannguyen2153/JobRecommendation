@@ -16,19 +16,21 @@ cv_dict = cv_parser.convertToDict(cv_info)
 
 
 
-jobinfo_path='vietnamworks/data/vnw_jobinfo_full.json'
+jobinfo_path='JobRecommendation/vnw_encoded_jobinfo_full.json'
 job_df = pd.read_json(jobinfo_path, encoding="utf-8")
 
 job_recommender = JobRecommender()
+
+job_recommender.attachJobs(job_df=job_df)
 
 start = time.time()
 
 job_recommender.attachCV(cv_dict=cv_dict)
 print(job_recommender.cv_text)
 
-similarity_job_df = job_recommender.computeJobsSimilarity(job_df=job_df[:50])
+similarity_job_df = job_recommender.computeJobsSimilarity()
 
 similarity_job_df = similarity_job_df.sort_values(by='similarity', ascending=False)
 
-print(similarity_job_df)
+print(similarity_job_df.head(50))
 print(f'Completed in {time.time() - start}s')
