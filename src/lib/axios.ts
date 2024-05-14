@@ -1,28 +1,28 @@
+'use client';
 import axios from 'axios';
-
+import { getCookie } from 'cookies-next';
 const config = {
-  baseURL: process.env.NEXT_PUBLIC_SITE_URL,
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   timeout: 5000,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 };
 
 const axiosClient = axios.create(config);
 
-// axiosClient.interceptors.request.use(function (config) {
-//   // Get cookies from the browser
-//   const token = window.localStorage.getItem('token');
-//   if (token) {
-//     console.log('token', token);
-//     config.headers['Authorization'] = `${token}`;
-//   } else {
-//     console.log(' No token');
-//   }
-//   return config;
-// });
+axiosClient.interceptors.request.use(function (config) {
+  // Get cookies from the browser
+  const token = getCookie('token');
+  if (token) {
+    console.log('token', token);
+    config.headers['Authorization'] = `${token}`;
+  } else {
+    console.log(' No token');
+  }
+  return config;
+});
 
 axiosClient.interceptors.response.use(
   (res: any) => {

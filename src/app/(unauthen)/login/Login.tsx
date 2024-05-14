@@ -58,13 +58,11 @@ const Login = ({ className }: { className?: string }) => {
       console.log('response:' + response);
       setIsLoading(false);
       if (response.status == 200) {
-        const payload = response.data.payload;
+        const payload = response.data.data;
         console.log('payload:' + JSON.stringify(payload));
-        const token = payload.token;
-        // localStorage.setItem('token', token);
-        // localStorage.setItem('user', JSON.stringify(payload.data));
+        const token = response.data.token;
         setCookie('token', token);
-        setCookie('user', JSON.stringify(payload.data));
+        setCookie('user', JSON.stringify(payload));
         router.push('/');
         toast.success('User login successfully!');
       } else if (response.status == 400) {

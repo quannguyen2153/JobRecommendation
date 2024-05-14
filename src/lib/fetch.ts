@@ -1,5 +1,3 @@
-/** @format */
-
 import axiosClient from './axios';
 
 export const getRequest = async ({ endPoint }) => {
@@ -18,6 +16,7 @@ export const postRequest = async ({ endPoint, formData, isFormData }) => {
         },
       }
     );
+    console.log('🚀 ~ postRequest ~ res:', res);
     return res;
   } catch (error) {
     return error;

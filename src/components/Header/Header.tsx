@@ -23,7 +23,7 @@ import { deleteCookie, getCookie } from 'cookies-next';
 
 export const Header = () => {
   const [user, setUser] = useState<string | null>(null);
-  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState(null);
 
   const { onGetAvatar } = useUser();
 
@@ -33,7 +33,7 @@ export const Header = () => {
       onGetAvatar((response: any) => {
         console.log('🚀 ~ response:', response);
         if (response.status === 200) {
-          setAvatar(response.data.payload);
+          setAvatar(response.data);
         }
       });
     }
@@ -105,7 +105,20 @@ export const Header = () => {
                 size="md"
                 radius="full"
                 startContent={
-                  avatar ? <Avatar src={avatar} /> : AssetSvg.human()
+                  avatar ? (
+                    <div
+                      style={{
+                        width: '70px',
+                        height: '70px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      dangerouslySetInnerHTML={{ __html: avatar }}
+                    />
+                  ) : (
+                    AssetSvg.human()
+                  )
                 }
               ></Button>
             </DropdownTrigger>

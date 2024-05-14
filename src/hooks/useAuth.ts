@@ -5,7 +5,7 @@ export const useAuth = () => {
   const onRegister = async (data, callback) => {
     try {
       const response = await postRequest({
-        endPoint: '/auth/register',
+        endPoint: '/signup/',
         formData: data,
         isFormData: false,
       });
@@ -19,7 +19,7 @@ export const useAuth = () => {
   const onLogin = async (data, callback) => {
     try {
       const response = await postRequest({
-        endPoint: '/auth/login',
+        endPoint: '/signin/',
         formData: data,
         isFormData: false,
       });

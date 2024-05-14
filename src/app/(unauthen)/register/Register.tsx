@@ -93,23 +93,24 @@ const Register = ({ className }: { className?: string }) => {
     onRegister(rest, (response) => {
       console.log('response:' + response);
       setIsLoading(false);
-      if (response.status === 200) {
+      if (response.status === 201) {
         toast.success('User created successfully!');
         //Start login using new account
         const { username, ...loginData } = rest;
-        onLogin(loginData, (response) => {
-          console.log('response:' + response);
+        onLogin(data, (loginResponse) => {
+          console.log('response:' + loginResponse);
           setIsLoading(false);
-          if (response.status == 200) {
-            const payload = response.data.payload;
+          if (loginResponse.status == 200) {
+            const payload = loginResponse.data.data;
             console.log('payload:' + JSON.stringify(payload));
-            const token = payload.token;
+            const token = loginResponse.data.token;
             // localStorage.setItem('token', token);
             // localStorage.setItem('user', JSON.stringify(payload.data));
             setCookie('token', token);
-            setCookie('user', JSON.stringify(payload.data));
+            setCookie('user', JSON.stringify(payload));
             router.push('/');
-          } else if (response.status == 400) {
+            toast.success('User login successfully!');
+          } else if (loginResponse.status == 400) {
             toast.error('Email already exists');
           } else {
             toast.error('Error when login user');
