@@ -12,7 +12,7 @@ class SignUpView(APIView):
   '''
   Sign up with email and password
   '''
-  http_method_names = ['post']
+  http_method_names = ['post', 'options']
 
   def post(self, request):
     # Get data from request
@@ -52,7 +52,7 @@ class SignInView(APIView):
   '''
   Sign in with email and password
   '''
-  http_method_names = ['post']
+  http_method_names = ['post', 'options']
   
   def post(self, request):
     # Get data from request
@@ -94,7 +94,7 @@ class ForgotPasswordView(APIView):
   '''
   Send password reset email to user
   '''
-  http_method_names = ['post']
+  http_method_names = ['post', 'options']
 
   def post(self, request):
     # Get data from request
@@ -133,7 +133,7 @@ class UserCVView(APIView):
   '''
   Upload and get user's own CV
   '''
-  http_method_names = ['get', 'post']
+  http_method_names = ['get', 'post', 'options']
   authentication_classes = [FirebaseAuthentication]
 
   def get(self, request):
@@ -184,7 +184,7 @@ class UserAvatarView(APIView):
   '''
   Get user's own avatar
   '''
-  http_method_names = ['get']
+  http_method_names = ['get', 'options']
   authentication_classes = [FirebaseAuthentication]
 
   def get(self, request):
