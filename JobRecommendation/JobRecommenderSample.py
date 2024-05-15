@@ -9,7 +9,7 @@ TOKEN = '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'
 
 cv_parser = CVParser(text_generation_api_url=API_URL, token=TOKEN, cv_format_path='TextGeneration/cv_form.txt')
 
-pdf_path = 'TextGeneration/sample_cv1.pdf'
+pdf_path = 'TextGeneration/sample_cv3.pdf'
 cv_info = cv_parser.parseFromPDF(cv_pdf_path=pdf_path)
 
 cv_dict = cv_parser.convertToDict(cv_info)
@@ -19,8 +19,12 @@ cv_dict = cv_parser.convertToDict(cv_info)
 jobinfo_path='JobRecommendation/vnw_encoded_jobinfo_full.json'
 job_df = pd.read_json(jobinfo_path, encoding="utf-8")
 
+encoded_fields_path='JobRecommendation/encoded_fields.json'
+field_df = pd.read_json(encoded_fields_path, encoding="utf-8")  
+
 job_recommender = JobRecommender()
 
+job_recommender.attachFields(field_df=field_df)
 job_recommender.attachJobs(job_df=job_df)
 
 start = time.time()
@@ -28,9 +32,9 @@ start = time.time()
 job_recommender.attachCV(cv_dict=cv_dict)
 print(job_recommender.cv_text)
 
-similarity_job_df = job_recommender.computeJobsSimilarity()
-
-similarity_job_df = similarity_job_df.sort_values(by='similarity', ascending=False)
+similarity_job_df = job_recommender.computeJobsSimilarity(sort=True, top_f=2)
 
 print(similarity_job_df.head(50))
 print(f'Completed in {time.time() - start}s')
+
+print(similarity_job_df.head(50)['fields'])

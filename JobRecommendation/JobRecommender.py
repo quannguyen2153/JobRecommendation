@@ -4,7 +4,10 @@ import pandas as pd
 
 class JobRecommender():
     def __init__(self) -> None:
-        self.model = SentenceTransformer("multi-qa-mpnet-base-dot-v1")
+        self.model = SentenceTransformer("multi-qa-mpnet-base-dot-v1")        
+        
+    def attachFields(self, field_df):
+        self.field_df = field_df        
         
     def attachJobs(self, job_df):
         self.job_df = job_df
@@ -13,6 +16,7 @@ class JobRecommender():
         self.cv = cv_dict        
         self.cv_text = self.extractCVDictToText()
         
+        self.cv_profession_encoded = self.model.encode(self.cv['Candidate\'s Profession'])
         self.cv_text_encoded = self.model.encode(self.cv_text)
         
     def extractCVDictToText(self):
@@ -40,10 +44,22 @@ class JobRecommender():
         
         return cv_text
     
-    def computeJobsSimilarity(self):
-        # Compute similarity
+    def computeJobsSimilarity(self, sort=True, top_f=2):
+        # Field similarity
+        similarity_field_df = self.field_df.copy(deep=True)
+        similarity_field_df['similarity'] = similarity_field_df['field_vector'] \
+                                            .apply(lambda x: util.dot_score(self.cv_profession_encoded, x).item())                                            
+        similarity_field_df = similarity_field_df.sort_values(by='similarity', ascending=False)
+        desc_similar_fields = similarity_field_df['field'].head(top_f).values.tolist()
+        print(desc_similar_fields)
+        
+        # Job similarity
         similarity_job_df = self.job_df.copy(deep=True)
+        similarity_job_df = similarity_job_df[similarity_job_df['en_fields'].apply(lambda x: any(item in desc_similar_fields for item in x))]
         similarity_job_df['similarity'] = similarity_job_df['req_vector'] \
                                             .apply(lambda x: util.dot_score(self.cv_text_encoded, x).item())
+                                            
+        if sort:
+            similarity_job_df = similarity_job_df.sort_values(by='similarity', ascending=False)
         
         return similarity_job_df
