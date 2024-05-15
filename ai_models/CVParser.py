@@ -48,18 +48,18 @@ class CVParser():
     
     def convertToDict(self, cv_info_text):
         patterns = {
-            "Candidate's Profession": r"[*+-]?\s*Candidate's Profession:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Name": r"[*+-]?\s*Candidate's Name:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Date of Birth": r"[*+-]?\s*Candidate's Date of Birth:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Phone": r"[*+-]?\s*Candidate's Phone:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Address": r"[*+-]?\s*Candidate's Address:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Email": r"[*+-]?\s*Candidate's Email:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Website": r"[*+-]?\s*Candidate's Website:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Skills": r"[*+-]?\s*Candidate's Skills:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Experiences": r"[*+-]?\s*Candidate's Experiences:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Education": r"[*+-]?\s*Candidate's Education:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's Certificates": r"[*+-]?\s*Candidate's Certificates:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
-            "Candidate's References": r"[*+-]?\s*Candidate's References:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Profession": r"[*\-+ ]*\s*Candidate's Profession:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Name": r"[*\-+ ]*\s*Candidate's Name:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Date of Birth": r"[*\-+ ]*\s*Candidate's Date of Birth:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Phone": r"[*\-+ ]*\s*Candidate's Phone:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Address": r"[*\-+ ]*\s*Candidate's Address:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Email": r"[*\-+ ]*\s*Candidate's Email:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Website": r"[*\-+ ]*\s*Candidate's Website:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Skills": r"[*\-+ ]*\s*Candidate's Skills:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Experiences": r"[*\-+ ]*\s*Candidate's Experiences:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Education": r"[*\-+ ]*\s*Candidate's Education:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's Certificates": r"[*\-+ ]*\s*Candidate's Certificates:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
+            "Candidate's References": r"[*\-+ ]*\s*Candidate's References:\s*([\s\S]*?)(?=\n[*\-+ ]*\s*Candidate's|\Z)",
         }
 
         cv_dict = dict.fromkeys(patterns.keys())
