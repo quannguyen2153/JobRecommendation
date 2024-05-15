@@ -11,6 +11,10 @@ class TextGenerator():
         # Payload details url: https://huggingface.co/docs/api-inference/detailed_parameters
         
         response = requests.post(self.api_url, headers=self.headers, json=payload)
-        result = response.json()[0]['generated_text']
+        
+        try:
+            result = response.json()[0]['generated_text']
+        except:
+            raise Exception(str(response.json()))
         
         return result

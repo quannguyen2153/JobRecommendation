@@ -1,8 +1,6 @@
 from transformers import AutoTokenizer
 from TextGenerator import TextGenerator
 
-import re
-
 class JobChatBot():
     def __init__(self, text_generation_api_url, token):
         self.text_generator = TextGenerator(api_url=text_generation_api_url, token=token)
@@ -24,8 +22,6 @@ class JobChatBot():
         
     def extractCVDictToText(self):
         extract_keys=['Candidate\'s Profession',
-                      'Candidate\'s Date of Birth',
-                      'Candidate\'s Address',
                       'Candidate\'s Skills',
                       'Candidate\'s Experiences',
                       'Candidate\'s Education',
