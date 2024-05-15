@@ -51,7 +51,6 @@ class JobRecommender():
                                             .apply(lambda x: util.dot_score(self.cv_profession_encoded, x).item())                                            
         similarity_field_df = similarity_field_df.sort_values(by='similarity', ascending=False)
         desc_similar_fields = similarity_field_df['field'].head(top_f).values.tolist()
-        print(desc_similar_fields)
         
         # Job similarity
         similarity_job_df = self.job_df.copy(deep=True)
