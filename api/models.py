@@ -17,3 +17,19 @@ class UserData:
     self.modified_at = modified_at or datetime.now()
     self.deleted = deleted
 
+class CVData:
+  def __init__(self, profession = None, name = None, dob = None, phone = None, 
+               address = None, email = None, website = None, skills = None, 
+               experiences = None, education = None, certificates = None, references = None):
+    self.profession = profession
+    self.name = name
+    self.dob = dob
+    self.phone = phone
+    self.address = address
+    self.email = email
+    self.website = website
+    self.skills = skills
+    self.experiences = experiences
+    self.education = education
+    self.certificates = certificates
+    self.references = references

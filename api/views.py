@@ -4,9 +4,10 @@ from rest_framework.response import Response
 import json
 
 from .forms import *
-from .firebase import UserResourceManager, AuthHelper
+from .firebase import UserResourceManager, AuthHelper, CVHelper
 from .serializers import *
 from .authenticate import FirebaseAuthentication
+
 
 class SignUpView(APIView):
   '''
@@ -166,7 +167,7 @@ class UserCVView(APIView):
       if 'file' not in request.FILES:
         raise Exception("No file uploaded.")
       cv_file = request.FILES['file']
-      UserResourceManager.upload_file("cv.pdf", cv_file, request.user.uid, request.auth)
+      CVHelper.upload_and_process_cv(cv_file, request.user.uid, request.auth)
     except Exception as e:
       return Response(
         data={

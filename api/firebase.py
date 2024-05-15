@@ -5,6 +5,7 @@ from .config import FIREBASE_CONFIG
 from .models import *
 from .serializers import *
 from .utils import generate_avatar
+from ai_models.CVParser import CVParser
 
 firebase_client = pyrebase.initialize_app(FIREBASE_CONFIG)
 
@@ -75,6 +76,47 @@ class UserResourceManager:
     # Get url
     url = storage_client.child(f'user/{user_id}/{filename}').get_url(download_token)
     return url
+
+class CVManager:
+  @staticmethod
+  def create(cv, user_id):
+    '''
+    Create a new CV in database
+    '''
+    database_client.child("cv").child(user_id).set(cv.__dict__)
+    return
+
+  @staticmethod
+  def get(user_id):
+    '''
+    Get CV by user_id from database
+    '''
+    cv_data = database_client.child("cv").child(user_id).get().val()
+    if cv_data is None:
+      return None
+    return CVData(**cv_data)
+
+class CVHelper:
+  '''
+  Helper class for uploading and processing CV
+  '''
+  @staticmethod
+  def upload_and_process_cv(file, user_id, token):
+    '''
+    Upload CV file to storage and process it
+    data: raw file data
+    '''
+    data = file.read()
+    # Upload file
+    result = UserResourceManager.upload_file("cv.pdf", data, user_id, token)
+    if result is None:
+      raise Exception("Failed to upload file.")
+    
+    # Process CV data and save to database
+    parsed_data = CVParser.parse_cv(data)
+    cv = CVSerializer(parsed_data).create()
+    CVManager.create(cv, user_id)
+    return
 
 class AuthHelper:
   @staticmethod
