@@ -53,16 +53,28 @@ class CVParser():
             return text.rstrip(".,!?;:-")
     
     def convertToDict(self, cv_info_text):
-        cv_info_text = cv_info_text + '\n' + '* End.'
-        
-        cv_dict = dict.fromkeys(self.cv_fields)
+        patterns = {
+            "Candidate's Profession": r"[*+-]?\s*Candidate's Profession:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Name": r"[*+-]?\s*Candidate's Name:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Date of Birth": r"[*+-]?\s*Candidate's Date of Birth:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Phone": r"[*+-]?\s*Candidate's Phone:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Address": r"[*+-]?\s*Candidate's Address:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Email": r"[*+-]?\s*Candidate's Email:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Website": r"[*+-]?\s*Candidate's Website:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Skills": r"[*+-]?\s*Candidate's Skills:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Experiences": r"[*+-]?\s*Candidate's Experiences:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Education": r"[*+-]?\s*Candidate's Education:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's Certificates": r"[*+-]?\s*Candidate's Certificates:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+            "Candidate's References": r"[*+-]?\s*Candidate's References:\s*([\s\S]*?)(?=\n[*+-]?\s*Candidate's|\Z)",
+        }
 
-        for field in self.cv_fields:
-            match = re.search(fr"{re.escape(field)}:?(.*?)\n\*", cv_info_text, re.DOTALL)
-            
+        cv_dict = dict.fromkeys(patterns.keys())
+
+        for key, pattern in patterns.items():
+            match = re.search(pattern, cv_info_text, re.DOTALL)
             if match:
-                cv_dict[field] = match.group(1).strip()
-
+                cv_dict[key] = match.group(1).strip()
+                
         return cv_dict
     
     def parseFromPDF(self, cv_pdf_path, clean=True, max_new_tokens=1000):
