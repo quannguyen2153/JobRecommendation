@@ -4,7 +4,7 @@ from TextGenerator import TextGenerator
 class JobChatBot():
     def __init__(self, text_generation_api_url, token):
         self.text_generator = TextGenerator(api_url=text_generation_api_url, token=token)
-        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
+        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", use_auth_token=token)
         
     def attachJob(self, job_dict):
         self.job = job_dict        

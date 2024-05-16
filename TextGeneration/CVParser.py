@@ -8,7 +8,7 @@ from TextGenerator import TextGenerator
 
 class CVParser():
     def __init__(self, text_generation_api_url, token, cv_format_path):
-        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
+        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", use_auth_token=token)
         self.text_generator = TextGenerator(api_url=text_generation_api_url, token=token)
         
         self.cv_format = self.readCVFormat(cv_format_path)        
