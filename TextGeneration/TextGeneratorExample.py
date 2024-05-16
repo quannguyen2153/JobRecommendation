@@ -9,34 +9,32 @@ TOKEN = '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'
 text_generator = TextGenerator(api_url=API_URL, token=TOKEN)    
 cv_parser = CVParser(text_generation_api_url=API_URL, token=TOKEN, cv_format_path='TextGeneration/cv_form.txt')
 
-pdf_path = 'TextGeneration/sample_cv.pdf'
-cv_info = cv_parser.parseFromPDF(cv_pdf_path=pdf_path)
+pdf_path = 'TextGeneration/sample_cv2.pdf'
+cv_dict = cv_parser.parseFromPDF(cv_pdf_path=pdf_path)
 
-# print(cv_info)
-
-cv_dict = cv_parser.convertToDict(cv_info)
+cv_dict = cv_parser.standardizeCVDict(cv_dict)
 
 
 jobchatbot = JobChatBot(text_generation_api_url=API_URL, token=TOKEN)    
 job_dict = {
-        "job_title":"Mechanical Service Engineer",
-        "job_url":"https:\/\/www.vietnamworks.com\/mechanical-service-engineer--1768459-jv?source=searchResults&searchType=2&placement=1771659&sortBy=latest",
-        "company_name":"Công Ty TNHH BHS Corrugated Machinery Việt Nam",
-        "company_url":"https:\/\/www.vietnamworks.com\/nha-tuyen-dung\/cong-ty-tnhh-bhs-corrugated-machinery-viet-nam-c154855",
-        "location":"Ho Chi Minh, Ho Chi Minh City, Vietnam",
-        "post_date":1713718800.0,
-        "due_date":1716829200.0,
-        "fields":"Khoa Học & Kỹ Thuật > Cơ Khí & Điện Lạnh",
-        "salary":"Thương lượng",
+        "job_title":"MT Sales Supervisor - Khu Vực Hà Nội",
+        "job_url":"https:\/\/www.vietnamworks.com\/mt-sales-supervisor-khu-vuc-ha-noi-1763221-jv?source=searchResults&searchType=2&placement=1770721&sortBy=latest",
+        "company_name":"Otsuka Thang Nutrition Co.,ltd.",
+        "company_url":"https:\/\/www.vietnamworks.com\/nha-tuyen-dung\/otsuka-thang-nutrition-co-ltd--c132178",
+        "location":"Ha Noi",
+        "post_date":1712509200.0,
+        "due_date":1715619600.0,
+        "fields":"Bán Lẻ\/Tiêu Dùng > Quản Lý Khu Vực",
+        "salary":"$680 - $970",
         "experience":None,
         "position":"Nhân viên",
         "benefits":[
-            "Thưởng\nMức lương hấp dẫn + Thưởng hàng năm",
-            "Cơ hội du lịch\nThời gian làm việc linh hoạt",
-            "Hoạt động nhóm\nĐược đào tạo và làm việc ở nước ngoài + Cơ hội phát triển và thăng tiến cao"
+            "Thưởng\nThưởng tháng 13, tháng 14 theo hiệu quả công việc",
+            "Chăm sóc sức khoẻ\nBảo hiểm sức khỏe BIC toàn diện",
+            "Máy tính xách tay\nMáy tính xách tay"
         ],
-        "job_description":"Duties and responsibilities\n1. Mechanical installation and commissioning of corrugated machines include steam piping assembling & supervising.\n2. Troubleshooting and maintenance corrugated machines at customer site.\n3. Start-up the machines, training customer regarding operation, maintenance, and spare parts knowledge.\n4. Advising \/ recommendation on spare parts, maintenance, and other service products to customer.\n5. Installation, commissioning, and service for corrugators and rolls\n6. Support BHS internal staff on service daily business, such as spare parts issue, machine problem advice, upgrade and so on.\n7. Prepare reports according to department regulations.\n8. Maintain relationship with customer.\n9. Other duty and tasks work assigned by supervisor",
-        "requirements":"1. Mechanical engineering background, bachelor, or diploma degree.\n2. 2-3 years field experience of maintenance\/troubleshooting to heavy duty machines.\n3. Be ready to travel frequently.\n4. Read and understand mechanical drawings and plant layouts, basic skills in pneumatic \/ hydraulic System-Operations.\n5. Be able to work under pressure, committed, dedicated and conscientious.\n6. Good communication skills.\n7. Good English spoken and written.\n8. Open mind and teamwork."
+        "job_description":"I. KEY RESPOSIBILITIES:\n\n1. Area Management (40%):\n• Understand the operation of customers in the area of responsibility.\n• Manage KPI targets for each client in the responsible area.\n• Control inventory - sell out of customers in the area of responsibility.\n• Plan and control promotion programs, activities and cost (coverage, hiring, promotion plan, sales support activities, POSM…). \n• Establish trusting relationships with clients for mutual benefits.\n2. Staff Management (30%):\n• Create effective sales pathways (sales, regions, opportunities, etc.).\n• Deploy and oversee the Sale Representative team's KPI implementation.\n• Make sure the team adheres to company requirements in its market execution.\n• Training Plan - Building Team\n• Build and maintain relationships with related departments.\n3. Data Management (20%):\n• In responsible of managing data related to sales, stores, allocation ratios, etc.\n• Present the activity plan via weekly\/monthly\/other frequency.\n• Deliver reports as requested.\n4. Localized Solutions (10%):\n• Find solutions and specific steps for regional development.\n• Idea or proposal to expand the responsible area.",
+        "requirements":"REQUIREMENT\n• Min: Bachelor’s Degree, Ideal: Financial, Sales & Marketing Knowledge\n• Has at least 2 years of experience in the position of Sale Supervisor MT.\n• Experience with the beverage industry is an advantage.\n• Leadership & interpersonal skills.\n• Good command of computer and statistics.\n• Strong analytical and planning skills, Customer business analysis.\n• Focused on outcomes, analytical in the details.\n• Decision-making based on facts and principles, as well as value-based management abilities.\n• Good communication skills in both Vietnamese and English.\n• Priority management, proactive, good analytic and critical thinking.\n• Have ability to build relationship with customer\n\nBENEFIT:\n• Working hours: from Mon to Fri (8:00– 17:00). \n• Annual leaves: 15 days per year. \n• Sick leaves: 4 days per year. \n• Covid leaves: no limited. \n• Performance Appraisal: one per year. \n• Bonus of 13th and bonus of Performance Evaluation based on company policy. \n• Others: annual health checkup, general medical insurance (BIC insurance)"
     }
 jobchatbot.attachJob(job_dict=job_dict)
 print(jobchatbot.job_requirements)
@@ -44,5 +42,5 @@ print(jobchatbot.job_requirements)
 jobchatbot.attachCV(cv_dict)
 print(jobchatbot.cv_text)
 
-response = jobchatbot.query(message="Is this candidate well-suited for this job?")
+response = jobchatbot.query(message="Which are requirements that the candidate does not meet for this job?")
 print(response)

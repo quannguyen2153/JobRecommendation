@@ -7,16 +7,16 @@ import time
 API_URL = "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct"
 TOKEN = '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'
 
-cv_parser = CVParser(text_generation_api_url=API_URL, token=TOKEN, cv_format_path='TextGeneration/cv_form.txt')
+cv_parser = CVParser(text_generation_api_url=API_URL, token=TOKEN, cv_format_path='TextGeneration/cv_format.json')
 
 pdf_path = 'TextGeneration/sample_cv3.pdf'
-cv_info = cv_parser.parseFromPDF(cv_pdf_path=pdf_path)
+cv_dict = cv_parser.parseFromPDF(cv_pdf_path=pdf_path)
 
-cv_dict = cv_parser.convertToDict(cv_info)
+cv_dict = cv_parser.standardizeCVDict(cv_dict)
 
 
 
-jobinfo_path='JobRecommendation/vnw_encoded_jobinfo_full.json'
+jobinfo_path='JobData/jobs.json'
 job_df = pd.read_json(jobinfo_path, encoding="utf-8")
 
 encoded_fields_path='JobRecommendation/encoded_fields.json'
