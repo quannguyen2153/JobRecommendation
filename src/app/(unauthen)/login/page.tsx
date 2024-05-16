@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import React from 'react';
 import { getProviders } from 'next-auth/react';
 import Login from './Login';
-import { mustBeLoggedIn } from '@/lib/auth';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -12,8 +11,6 @@ export const metadata: Metadata = {
 };
 
 const LoginPage = async () => {
-  // const providers = await getProviders();
-  // await mustBeLoggedIn();
   return (
     <>
       <div className="p-12 relative h-screen w-full ">

@@ -7,7 +7,6 @@ import { Icons } from '@/assets/Icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -24,7 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { setCookie } from 'cookies-next';
 
 const formSchema = z.object({
@@ -68,7 +67,7 @@ const Login = ({ className }: { className?: string }) => {
       } else if (response.status == 400) {
         toast.error('Email already exists');
       } else {
-        toast.error('Error when login user');
+        toast.error('Email or password incorrect!');
       }
     });
   }
@@ -83,7 +82,6 @@ const Login = ({ className }: { className?: string }) => {
       <div
         className={cn('grid gap-6 w-[80%] md:w-[70%] lg:w-[60%] ', className)}
       >
-        <ToastContainer />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid gap-6">

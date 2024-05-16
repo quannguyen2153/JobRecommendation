@@ -1,10 +1,13 @@
 import { Header } from '@/components/Header';
+import Providers from '@/providers/Providers';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className={`w-full h-full`}>
-      <Header></Header>
-      {children}
+      <Providers>
+        <Header></Header>
+        {children}
+      </Providers>
     </div>
   );
 }

@@ -26,7 +26,7 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader, Router } from 'lucide-react';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { setCookie } from 'cookies-next';
 
 //quan ly form: react-hook-form

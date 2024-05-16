@@ -4,6 +4,7 @@ import Filter from './Filter';
 import {
   Button,
   Input,
+  Link,
   Pagination,
   Select,
   SelectItem,
@@ -13,6 +14,11 @@ import JobListItem from './JobListItem';
 import JobDescriptionCard from './JobDescriptionCard';
 import FileCard from '@/components/FileCard/FileCard';
 import { FileDialog } from '@/components/FileDialog';
+import ChatInput from './ChatInput';
+import ChatHeader from './ChatHeader';
+import ChatMessages from './ChatMessages';
+import { useUser } from '@/hooks/useUser';
+import { set } from 'react-hook-form';
 
 const sampleJobData = [
   {
@@ -138,7 +144,7 @@ const sampleJobData = [
       "• Bachelor's degree, preferably in Accounting - Auditing, Finance, Economics, or Banking.\n• Experience in Accounting - Auditing, Financial Statement Consolidation.\n• Minimum 4 years of experience in Business Development with Enterprise clients in Accounting - Auditing, Finance, and Technology.\n• Passion for sales and passion for technology.\n• Enthusiastic, energetic, eager to learn.\n• Ability to work in teams, and handle pressure well.\n• Good communication and presentation skills.",
   },
 ];
-const page = () => {
+const RecommendPage = () => {
   // //Set state of fitlers
   // //(If click on filter button, the filter component will be shown
   // //and the state will be set to true, otherwise it will be false)
@@ -174,7 +180,7 @@ const page = () => {
     { id: 2, option: 'Oldest' },
   ];
 
-  // //Selected job description data
+  //Selected job description data
   const [selectedJob, setSelectedJob] = useState(sampleJobData[0]);
 
   //Onchange when click item in job list
@@ -184,26 +190,49 @@ const page = () => {
 
   //CV state
   const [cvFile, setCvFile] = useState([]);
-  const [lastModifiedTime, setLastModifiedTime] = useState<Date>();
+  const [uploadedcvLink, setUploadedCvLink] = useState(undefined); //uploaded cv file link
+  //useUser hook
+  const { onGetCv, onPostCv } = useUser();
+
+  const uploadedcvFileFunc = async () => {
+    await onGetCv((response) => {
+      setUploadedCvLink(response.data.data.download_url);
+    });
+  };
 
   useEffect(() => {
-    if (cvFile.length > 0) {
-      const file = cvFile[0];
-      setLastModifiedTime(new Date());
-    }
-  }, [cvFile]);
+    uploadedcvFileFunc();
+  }, []);
 
   //CV modal state
   const [open, setOpen] = useState(false);
 
+  const onUploadingCv = async () => {
+    if (cvFile.length > 0) {
+      console.log('uploading', cvFile[0]);
+      const formData = new FormData();
+      formData.append('file', cvFile[0]);
+
+      try {
+        const response = await onPostCv(formData, (response) => {
+          console.log(response.data);
+          //Get url of uploaded cv file
+          uploadedcvFileFunc();
+        });
+
+        console.log(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   //Job description modal state
   const [showJobDescriptionModal, setShowJobDescriptionModal] = useState(false);
 
-  const [chatOpen, setChatOpen] = useState(false);
-
   return (
     <div className="w-full h-full flex flex-col justify-center items-center gap-4">
-      {cvFile.length == 0 ? (
+      {!uploadedcvLink ? (
         <div className="w-full h-fit flex flex-col justify-center items-center pt-8 gap-4">
           <p className="text-[#858585]">
             Upload your CV to find the best jobs for you
@@ -216,16 +245,27 @@ const page = () => {
             aria-label="Upload your CV"
             className="w-[35%] md:w-[25%] lg:w-[20%] xl:w-[15%] text-sm lg:text-large"
             startContent={AssetSvg.upload()}
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              onUploadingCv();
+              setOpen(true);
+            }}
           >
             Upload your CV
           </Button>
         </div>
       ) : (
         <div className="w-full h-fit flex flex-col items-center justify-center gap-4">
-          {cvFile.length > 0 ? (
-            <div className="w-full h-fit flex flex-col justify-center items-center gap-5 mt-8">
-              <FileCard
+          <div className="w-full h-fit flex flex-col justify-center items-center gap-5 mt-8">
+            <Button
+              as={Link}
+              href={uploadedcvLink}
+              color="primary"
+              showAnchorIcon
+            >
+              Your CV Link
+            </Button>
+
+            {/* <FileCard
                 key={'cv'}
                 files={cvFile}
                 setFiles={setCvFile}
@@ -234,32 +274,31 @@ const page = () => {
               <div className="w-full h-fit flex flex-row mt-3 text-black justify-center items-center gap-8 font-bold">
                 <span>Chỉnh sửa lần cuối</span>
                 <span>{lastModifiedTime?.toLocaleString()}</span>
-              </div>
-              <div className="w-full h-fit flex flex-row justify-center items-center gap-4">
-                <Button
-                  className={`
-             border-orange w-32 m-4`}
-                  variant="bordered"
-                  radius="sm"
-                  onClick={() => {
-                    setOpen(true);
-                  }}
-                >
-                  Chỉnh sửa
-                </Button>
-                {/* <Button
+              </div> */}
+            <div className="w-full h-fit flex flex-row justify-center items-center gap-4">
+              <Button
                 className={`
-                  bg-orange text-white
              border-orange w-32 m-4`}
                 variant="bordered"
                 radius="sm"
-                onClick={onSubmit}
+                onClick={() => {
+                  setOpen(true);
+                }}
               >
-                Lưu
-              </Button> */}
-              </div>
+                Modify
+              </Button>
+              <Button
+                className={`
+                  bg-orange
+             border-orange w-32 m-4`}
+                variant="bordered"
+                radius="sm"
+                onClick={onUploadingCv}
+              >
+                Save
+              </Button>
             </div>
-          ) : null}
+          </div>
         </div>
       )}
 
@@ -351,8 +390,8 @@ const page = () => {
         </div>
       </div> */}
 
-      <div className="w-full h-fit flex flex-row gap-3 bg-secondary mt-8">
-        <div className="w-[50%] h-fit mx-8 my-16 flex flex-col">
+      <div className="w-full h-fit flex flex-row gap-3 bg-secondary mt-8 z-0">
+        <div className="w-[50%] h-full mx-8 my-16 flex flex-col z-10">
           <div className="w-full h-fit flex flex-row justify-between items-center">
             <p className="font-bold text-lg text-black">
               {sampleJobData.length} Jobs
@@ -441,6 +480,15 @@ const page = () => {
           ) : null}
         </div>
 
+        <div className="z-0 w-[50%] h-[600px] mx-8 my-16 flex flex-col rounded-lg bg-white">
+          <div className="h-[80%] w-full flex flex-col ">
+            <ChatHeader></ChatHeader>
+            <ChatMessages></ChatMessages>
+          </div>
+
+          <ChatInput className="w-full h-[15%] p-3 z-0"></ChatInput>
+        </div>
+
         {/* <div className="w-[50%] h-full mx-8 my-16">
           <JobDescriptionCard data={selectedJob}></JobDescriptionCard>
         </div> */}
@@ -449,4 +497,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default RecommendPage;

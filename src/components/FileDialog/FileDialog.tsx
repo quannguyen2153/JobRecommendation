@@ -53,7 +53,7 @@ export function FileDialog<TFieldValues extends FieldValues>({
     'image/*': [],
     'application/pdf': ['.pdf'],
   },
-  maxSize = 1024 * 1024 * 2,
+  maxSize = 8096 * 8096 * 2,
   maxFiles = 1,
   files,
   setFiles,

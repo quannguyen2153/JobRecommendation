@@ -26,7 +26,7 @@ const JobDescriptionCard = ({
 }) => {
   return (
     <ScrollShadow
-      hideScrollBar
+      isEnabled={false}
       className="w-[660px] z-0 h-[450px] border-3 rounded-md flex flex-col gap-3 bg-white shadow-md text-black p-3"
     >
       <div className="flex flex-row gap-5 items-center">

@@ -56,44 +56,7 @@ export const Header = () => {
         {AssetSvg.logo()}
         <p className="font-bold text-primary">{Constants.APP_NAME}</p>
       </NavbarBrand>
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem className={`${pathname === '/' ? 'font-bold' : ''}`}>
-          <Link color="foreground" href="/" onClick={() => handleClick('/')}>
-            Home
-          </Link>
-        </NavbarItem>
-        <NavbarItem className={`${pathname === '/search' ? 'font-bold' : ''}`}>
-          <Link
-            href="/search"
-            aria-current="page"
-            onClick={() => handleClick('/search')}
-          >
-            Search
-          </Link>
-        </NavbarItem>
-        <NavbarItem
-          className={`${pathname === '/recommend' ? 'font-bold' : ''}`}
-        >
-          <Link
-            color="foreground"
-            href="/recommend"
-            onClick={() => handleClick('/recommend')}
-          >
-            Recommendation
-          </Link>
-        </NavbarItem>
-        <NavbarItem
-          className={`${pathname === '/improve-cv' ? 'font-bold' : ''}`}
-        >
-          <Link
-            color="foreground"
-            href="/improve-cv"
-            onClick={() => handleClick('/improve-cv')}
-          >
-            Improve your CV
-          </Link>
-        </NavbarItem>
-      </NavbarContent>
+
       {user ? (
         <NavbarContent justify="end" className="w-32">
           <Dropdown placement="bottom-end" className="text-black">
