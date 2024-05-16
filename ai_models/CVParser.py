@@ -22,7 +22,7 @@ class CVParser():
                             + '\"\n---\nExtract information from this CV into the following JSON format with utf-8 encoding:\n' \
                             + self.cv_format
                             
-        tokens = self.tokenizer.tokenize(self.cv_format)
+        tokens = self.tokenizer.tokenize(cv_raw_text)
         cv_tokens = len(tokens)
         total_tokens = cv_tokens + self.cv_format_tokens
                             
