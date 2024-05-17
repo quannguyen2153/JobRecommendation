@@ -4,10 +4,9 @@ from rest_framework.response import Response
 import json
 
 from .forms import *
-from .firebase import UserResourceManager, JobManager, AuthHelper, CVHelper
+from .firebase import UserResourceManager, JobManager, CVManager, AuthHelper, CVHelper
 from .serializers import *
 from .authenticate import FirebaseAuthentication
-
 
 class SignUpView(APIView):
   '''
@@ -139,7 +138,7 @@ class UserCVView(APIView):
 
   def get(self, request):
     try:
-      download_url = UserResourceManager.get_url("cv.pdf", request.user.uid, request.auth)
+      file_info = CVManager.get_cv_file_info(request.user.uid)
     except Exception as e:
       return Response(
         data = {
@@ -149,7 +148,7 @@ class UserCVView(APIView):
         status=400
       )
     
-    if download_url is None:
+    if file_info is None:
       return Response(
         data = {
           "success": False, 
@@ -157,9 +156,12 @@ class UserCVView(APIView):
         }, 
         status=404
       )
-    return Response({
-      "success": True,
-      "data": {"download_url": download_url}}, 
+    return Response(
+      data={
+        "success": True,
+        "data": CVFileInfoSerializer(file_info).data
+      },
+      status=200
     )
 
   def post(self, request):
@@ -167,8 +169,9 @@ class UserCVView(APIView):
       if 'file' not in request.FILES:
         raise Exception("No file uploaded.")
       cv_file = request.FILES['file']
-      CVHelper.upload_and_process_cv(cv_file, request.user.uid, request.auth)
+      file_info = CVHelper.upload_and_process_cv(cv_file, request.user.uid, request.auth)
     except Exception as e:
+      raise e
       return Response(
         data={
           "success": False, 
@@ -178,7 +181,8 @@ class UserCVView(APIView):
       )
     return Response({
       "success": True, 
-      "message": "File uploaded successfully."
+      "message": "File uploaded successfully.",
+      "data": CVFileInfoSerializer(file_info).data
     })
   
 class UserAvatarView(APIView):

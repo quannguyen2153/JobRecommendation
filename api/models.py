@@ -38,6 +38,9 @@ class JobData:
     self.requirements = requirements
 
 class CVData:
+  '''
+  Class to store parsed CV data
+  '''
   def __init__(self, profession = None, name = None, dob = None, phone = None, 
                address = None, email = None, website = None, skills = None, 
                experiences = None, education = None, certificates = None, references = None):
@@ -53,3 +56,13 @@ class CVData:
     self.education = education
     self.certificates = certificates
     self.references = references
+
+class CVFileInfo:
+  '''
+  Class to store CV file information
+  '''
+  def __init__(self, file_name, file_size, file_url, uploaded_at):
+    self.file_name = file_name
+    self.file_size = file_size
+    self.file_url = file_url
+    self.uploaded_at = uploaded_at

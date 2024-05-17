@@ -4,7 +4,7 @@ import requests
 from .config import FIREBASE_CONFIG, PAGE_SIZE
 from .models import *
 from .serializers import *
-from .utils import generate_avatar
+from .utils import generate_avatar, convert_size
 from ai_models.CVParser import CVParser
 
 firebase_client = pyrebase.initialize_app(FIREBASE_CONFIG)
@@ -55,10 +55,12 @@ class UserResourceManager:
   @staticmethod
   def upload_file(filename, data, user_id, token):
     '''
-    Upload a file to storage
+    Upload a file to storage and return download url
     '''
-    result = storage_client.child(f'user/{user_id}/{filename}').put(data, token)
-    return result
+    path = f'user/{user_id}/{filename}'
+    result = storage_client.child(path).put(data, token)
+    download_url = storage_client.child(path).get_url(result['downloadTokens'])
+    return download_url
   
   @staticmethod
   def get_url(filename, user_id, id_token):
@@ -79,22 +81,34 @@ class UserResourceManager:
 
 class CVManager:
   @staticmethod
-  def create(cv, user_id):
+  def create(cv_data, file_info, user_id):
     '''
     Create a new CV in database
     '''
-    database_client.child("cv").child(user_id).set(cv.__dict__)
+    database_client.child("cv_data").child(user_id).set(cv_data.__dict__)
+    database_client.child("cv_file_info").child(user_id).set(file_info.__dict__)
+    print("CV data and file info saved to database.")
     return
 
   @staticmethod
-  def get(user_id):
+  def get_cv_data(user_id):
     '''
-    Get CV by user_id from database
+    Get CV data by user_id from database
     '''
-    cv_data = database_client.child("cv").child(user_id).get().val()
+    cv_data = database_client.child("cv_data").child(user_id).get().val()
     if cv_data is None:
       return None
     return CVData(**cv_data)
+
+  @staticmethod
+  def get_cv_file_info(user_id):
+    '''
+    Get CV file info by user_id from database
+    '''
+    file_info = database_client.child("cv_file_info").child(user_id).get().val()
+    if file_info is None:
+      return None
+    return CVFileInfo(**file_info)
 
 
 class JobManager:
@@ -130,19 +144,34 @@ class CVHelper:
   def upload_and_process_cv(file, user_id, token):
     '''
     Upload CV file to storage and process it
-    data: raw file data
+    return: file_info
     '''
+    file_name = file.name
+    if not file_name.endswith(".pdf"):
+      raise Exception("Invalid file type. Only PDF files are supported.")
+    if len(file_name) > 40:
+      raise Exception("File name too long.")
+
     data = file.read()
-    # Upload file
-    result = UserResourceManager.upload_file("cv.pdf", data, user_id, token)
-    if result is None:
+    file_size = convert_size(len(data))
+    # Upload file to storage
+    download_url = UserResourceManager.upload_file("cv.pdf", data, user_id, token)
+    if download_url is None:
       raise Exception("Failed to upload file.")
     
     # Process CV data and save to database
+    file_info = CVFileInfoSerializer(data={
+      "file_name": file_name,
+      "file_size": file_size,
+      "file_url": download_url,
+      "uploaded_at": int(datetime.now().timestamp())
+    }).create()
+
     parsed_data = CVParser.parse_cv(data)
-    cv = CVSerializer(parsed_data).create()
-    CVManager.create(cv, user_id)
-    return
+    cv = CVDataSerializer(parsed_data).create()
+
+    CVManager.create(cv, file_info, user_id)
+    return file_info
 
 class AuthHelper:
   @staticmethod

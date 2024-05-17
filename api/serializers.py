@@ -43,7 +43,7 @@ class JobSerializer(serializers.Serializer):
     self.is_valid(raise_exception=True)
     return JobData(**self.data)
 
-class CVSerializer(serializers.Serializer):
+class CVDataSerializer(serializers.Serializer):
   profession = serializers.CharField(source="Candidate's Profession", required=False)
   name = serializers.CharField(source="Candidate's Name", required=False)
   dob = serializers.CharField(source="Candidate's Date of Birth", required=False)
@@ -59,3 +59,13 @@ class CVSerializer(serializers.Serializer):
 
   def create(self):
     return CVData(**self.data)
+  
+class CVFileInfoSerializer(serializers.Serializer):
+  file_name = serializers.CharField()
+  file_size = serializers.CharField()
+  file_url = serializers.URLField()
+  uploaded_at = serializers.IntegerField()
+
+  def create(self):
+    self.is_valid(raise_exception=True)
+    return CVFileInfo(**self.data)
