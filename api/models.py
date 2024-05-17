@@ -17,6 +17,26 @@ class UserData:
     self.modified_at = modified_at or datetime.now()
     self.deleted = deleted
 
+class JobData:
+  def __init__(self, job_title=None, job_url=None, company_name=None, company_url=None, company_img_url=None, 
+               location=None, post_date=None, due_date=None, fields=None, salary=None, position=None, 
+               benefits=None, experience=None, job_description=None, requirements=None):
+    self.job_title = job_title
+    self.job_url = job_url
+    self.company_name = company_name
+    self.company_url = company_url
+    self.company_img_url = company_img_url
+    self.location = location
+    self.post_date = post_date
+    self.due_date = due_date
+    self.fields = fields
+    self.salary = salary
+    self.position = position
+    self.benefits = benefits
+    self.experience = experience
+    self.job_description = job_description
+    self.requirements = requirements
+
 class CVData:
   def __init__(self, profession = None, name = None, dob = None, phone = None, 
                address = None, email = None, website = None, skills = None, 

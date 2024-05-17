@@ -11,3 +11,6 @@ class SignInForm(forms.Form):
 
 class ForgotPasswordForm(forms.Form):
   email = forms.EmailField()
+
+class GetJobsForm(forms.Form):
+  page = forms.IntegerField(required=False)

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 import json
 
 from .forms import *
-from .firebase import UserResourceManager, AuthHelper, CVHelper
+from .firebase import UserResourceManager, JobManager, AuthHelper, CVHelper
 from .serializers import *
 from .authenticate import FirebaseAuthentication
 
@@ -200,3 +200,31 @@ class UserAvatarView(APIView):
         }, 
         status=400
       )
+    
+class JobView(APIView):
+  '''
+  Get jobs details
+  '''
+  http_method_names = ['get', 'options']
+
+  def get(self, request):
+    request_data = request.query_params
+    form = GetJobsForm(data=request_data)
+    if not form.is_valid():
+      return Response(
+        data={
+          "success": False, 
+          "message": form.errors.as_data()
+        }, 
+        status=400
+      )
+    page = int(form.data.get('page', 1))
+    list_ids = [i for i in range(999)]
+    jobs = JobManager.get_job_dummy(list_ids, page)
+    return Response(
+      status=200,
+      data={
+      "total": len(list_ids),
+      "page": page,
+      "data": JobSerializer(jobs, many=True).data
+    })

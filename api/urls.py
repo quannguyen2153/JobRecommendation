@@ -11,4 +11,5 @@ api_urls = [
   path('signin/', views.SignInView.as_view()),
   path('forgot-password/', views.ForgotPasswordView.as_view()),
   path('user/', include(user_urls)),
+  path('jobs/', views.JobView.as_view()),
 ]

@@ -22,6 +22,27 @@ class UserSerializer(serializers.Serializer):
     self.is_valid(raise_exception=True)
     return UserData(**self.data)
 
+class JobSerializer(serializers.Serializer):
+  job_title = serializers.CharField()
+  job_url = serializers.URLField()
+  company_name = serializers.CharField()
+  company_url = serializers.URLField()
+  company_img_url = serializers.URLField()
+  location = serializers.CharField()
+  post_date = serializers.IntegerField()
+  due_date = serializers.IntegerField()
+  fields = serializers.CharField()
+  salary = serializers.CharField()
+  position = serializers.CharField()
+  benefits = serializers.CharField()
+  experience = serializers.CharField()
+  job_description = serializers.CharField()
+  requirements = serializers.CharField()
+  
+  def create(self):
+    self.is_valid(raise_exception=True)
+    return JobData(**self.data)
+
 class CVSerializer(serializers.Serializer):
   profession = serializers.CharField(source="Candidate's Profession", required=False)
   name = serializers.CharField(source="Candidate's Name", required=False)

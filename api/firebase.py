@@ -1,7 +1,7 @@
 import pyrebase
 import requests
 
-from .config import FIREBASE_CONFIG
+from .config import FIREBASE_CONFIG, PAGE_SIZE
 from .models import *
 from .serializers import *
 from .utils import generate_avatar
@@ -95,6 +95,32 @@ class CVManager:
     if cv_data is None:
       return None
     return CVData(**cv_data)
+
+
+class JobManager:
+  @staticmethod
+  def get_all_jobs():
+    '''
+    Get all jobs from database
+    '''
+    jobs = database_client.child("jobs").get().val()
+    return [JobData(**job) for job in jobs.values()]
+
+  @staticmethod
+  def get_jobs(job_ids):
+    '''
+    Get jobs by ids from database
+    '''
+    return [JobData(**database_client.child("jobs").child(id).get().val()) for id in job_ids]
+  
+  @staticmethod
+  def get_job_dummy(list_ids, page):
+    '''
+    Get jobs dummy
+    '''
+    start = (page - 1) * PAGE_SIZE
+    end = page * PAGE_SIZE
+    return JobManager.get_jobs(list_ids[start:end])
 
 class CVHelper:
   '''
