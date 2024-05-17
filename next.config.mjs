@@ -19,6 +19,12 @@ const nextConfig = {
             }
         ]
     },
+    images: {
+        domains: ['images.careerviet.vn'],
+        remotePatterns: [
+
+        ]
+    },
     /* config options here */
     typescript: {
         // !! WARN !!

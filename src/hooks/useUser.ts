@@ -1,5 +1,4 @@
 import { getRequest, postRequest } from '@/lib/fetch';
-import jwt from 'jsonwebtoken';
 
 export const useUser = () => {
   const onGetAvatar = async (callback) => {

@@ -58,7 +58,6 @@ const Login = ({ className }: { className?: string }) => {
       setIsLoading(false);
       if (response.status == 200) {
         const payload = response.data.data;
-        console.log('payload:' + JSON.stringify(payload));
         const token = response.data.token;
         setCookie('token', token);
         setCookie('user', JSON.stringify(payload));

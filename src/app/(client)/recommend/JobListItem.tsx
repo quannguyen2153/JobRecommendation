@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { AssetSvg } from '@/assets/AssetSvg';
-import { calculateDueTime } from '@/lib/utils';
+import { removeBrackets } from '@/lib/utils';
 
 const JobListItem = ({
   data,
@@ -12,6 +12,7 @@ const JobListItem = ({
     job_url: string;
     company_name: string;
     company_url: string;
+    company_img_url: string;
     location: string;
     post_date: Date;
     due_date: Date | null;
@@ -19,12 +20,14 @@ const JobListItem = ({
     salary: string | null;
     experience: string | null;
     position: string;
-    benefits: string[];
+    benefits: string;
     job_description: string;
     requirements: string;
   };
   isSelected: boolean;
 }) => {
+  //Format strings
+  const location = data.location ? removeBrackets(data.location) : '';
   return (
     <div
       className={`w-full h-fit rounded-md p-3 flex flex-row items-center justify-around  border-3 ${
@@ -33,7 +36,11 @@ const JobListItem = ({
     >
       <Image
         className="w-[10%]"
-        src="https://images.vietnamworks.com/img/company-default-logo.svg"
+        src={
+          data.company_img_url
+            ? data.company_img_url
+            : `https://images.vietnamworks.com/img/company-default-logo.svg`
+        }
         width={40}
         height={40}
         alt="Company logo"
@@ -45,7 +52,7 @@ const JobListItem = ({
         <div className="w-full h-fit flex flex-row gap-2 mt-1 justify-between text-xs text-primary">
           <div className="h-8 w-fit flex flex-row items-center justify-center gap-2">
             <div className="flex-shrink-0">{AssetSvg.location()}</div>
-            <p>{data.location}</p>
+            <p>{location}</p>
           </div>
           <div className="h-8 w-fit flex flex-row items-center justify-center gap-2">
             {AssetSvg.money()}

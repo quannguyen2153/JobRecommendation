@@ -104,3 +104,23 @@ export function calculateDueTime(due_date: Date) {
   }
   return timeLeft;
 }
+
+export function removeBrackets(str: string): string {
+  // Step 1: Remove the brackets
+  const trimmedString = str.replace(/^\[|\]$/g, '');
+
+  // Step 2: Replace single quotes with double quotes to create a valid JSON string
+  const validJsonString = trimmedString.replace(/'/g, '"');
+
+  // Step 3: Parse the JSON string into an array
+  const arrayFromString = JSON.parse('[' + validJsonString + ']');
+
+  // Step 4: Join the array elements into a single string separated by commas
+  const joinedString = arrayFromString.join(', ');
+
+  return joinedString;
+}
+
+export function removeSlash(str) {
+  return str.replace(/\//g, '');
+}

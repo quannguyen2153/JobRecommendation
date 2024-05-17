@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Button, ScrollShadow } from '@nextui-org/react';
 import { AssetSvg } from '@/assets/AssetSvg';
-import { calculateDueTime } from '@/lib/utils';
+import { calculateDueTime, removeBrackets, removeSlash } from '@/lib/utils';
 
 const JobDescriptionCard = ({
   data,
@@ -10,6 +10,7 @@ const JobDescriptionCard = ({
   data: {
     job_title: string;
     job_url: string;
+    company_img_url: string;
     company_name: string;
     company_url: string;
     location: string;
@@ -19,11 +20,34 @@ const JobDescriptionCard = ({
     salary: string | null;
     experience: string | null;
     position: string;
-    benefits: string[];
+    benefits: string;
     job_description: string;
     requirements: string;
   };
 }) => {
+  //Format strings
+  const benefits = data.benefits ? removeBrackets(data.benefits) : '';
+  const fields = data.fields ? removeBrackets(data.fields) : '';
+  const location = data.location ? removeBrackets(data.location) : '';
+
+  const job_description = data.job_description
+    ? removeSlash(data.job_description)
+    : '';
+
+  const requirements = data.requirements ? removeSlash(data.requirements) : '';
+
+  //Function to split job description into paragraphs
+  function JobDescriptionCard(jd: string) {
+    const descriptionWithLineBreaks = jd.split('\n').map((text, index) => (
+      <span key={index}>
+        {text}
+        <br />
+      </span>
+    ));
+
+    return <p>{descriptionWithLineBreaks}</p>;
+  }
+
   return (
     <ScrollShadow
       isEnabled={false}
@@ -32,7 +56,11 @@ const JobDescriptionCard = ({
       <div className="flex flex-row gap-5 items-center">
         <Image
           className="w-[8%]"
-          src="https://images.vietnamworks.com/img/company-default-logo.svg"
+          src={
+            data.company_img_url
+              ? data.company_img_url
+              : `https://images.vietnamworks.com/img/company-default-logo.svg`
+          }
           width={40}
           height={40}
           alt="Company logo"
@@ -43,7 +71,7 @@ const JobDescriptionCard = ({
           <p className="text-sm">{data.company_name}</p>
           <div className="w-fit h-fit flex flex-row items-center justify-center gap-2 text-xs text-primary">
             <div className="flex-shrink-0">{AssetSvg.location()}</div>
-            <p className="min-w-[10ch]">{data.location}</p>
+            <p className="min-w-[10ch]">{location}</p>
           </div>
           <div className="w-full h-fit flex flex-row gap-2 mt-1 justify-between text-xs text-primary">
             <div className="w-fit flex flex-row items-center justify-center gap-2">
@@ -79,15 +107,15 @@ const JobDescriptionCard = ({
         <div className="w-full flex flex-col gap-3">
           <div className="w-full h-fit flex flex-col gap-2">
             <p className="font-bold">Fields</p>
-            <p>{data.fields}</p>
+            <p>{fields}</p>
           </div>
           <div className="w-full h-fit flex flex-col gap-2">
             <p className="font-bold">Job Descriptions</p>
-            <p>{data.job_description}</p>
+            <div>{JobDescriptionCard(job_description)}</div>
           </div>
           <div className="w-full h-fit flex flex-col gap-2">
             <p className="font-bold">Requirements</p>
-            <p>{data.requirements}</p>
+            <p>{JobDescriptionCard(requirements)}</p>
           </div>
 
           <div className="w-full h-fit flex flex-col gap-2">
@@ -96,7 +124,7 @@ const JobDescriptionCard = ({
           </div>
           <div className="w-full h-fit flex flex-col gap-2">
             <p className="font-bold">Benefits</p>
-            <p>{data.benefits}</p>
+            <p>{benefits}</p>
           </div>
         </div>
       </div>

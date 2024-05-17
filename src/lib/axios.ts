@@ -3,7 +3,6 @@ import axios from 'axios';
 import { getCookie } from 'cookies-next';
 const config = {
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
-  timeout: 5000,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
