@@ -1,1 +1,1 @@
-export const Constants = { APP_NAME: 'JOB RECOMMENDER' };
+export const Constants = { APP_NAME: 'Oppurtuno' };

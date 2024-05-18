@@ -19,11 +19,15 @@ const nextConfig = {
             }
         ]
     },
-    images: {
-        domains: ['images.careerviet.vn'],
-        remotePatterns: [
 
-        ]
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: '*.careerviet.vn',
+                pathname: '**',
+            },
+        ],
     },
     /* config options here */
     typescript: {

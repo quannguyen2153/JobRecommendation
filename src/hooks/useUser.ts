@@ -33,10 +33,9 @@ export const useUser = () => {
         endPoint: '/user/cv/',
       });
       console.log('🚀 ~ onGetCv ~ response:', response);
-      callback(response);
-      return response;
+      callback(response.data.data);
     } catch (error) {
-      console.log(error);
+      callback(error);
     }
   };
   return {

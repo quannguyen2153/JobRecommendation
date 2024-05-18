@@ -9,9 +9,11 @@ import { useEffect } from 'react';
 export default function Home() {
   const router = useRouter();
 
-  if (!isSessionValid()) {
-    router.push('/login');
-  }
+  useEffect(() => {
+    if (!isSessionValid()) {
+      router.push('/login');
+    }
+  }, []);
 
   return (
     <div className="w-full h-full bg-white">

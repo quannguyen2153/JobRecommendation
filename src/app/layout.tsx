@@ -9,20 +9,11 @@ const montserrat = Montserrat({
 });
 
 const metadata: Metadata = {
-  title: 'Job Recommender',
-  description: 'Help you find the best job for you!',
+  title: 'Oppurtuno',
+  description: "We'll help find the best job for you!",
 };
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
-  //use mock session
-  // const session = await getSession();
-  const session = {
-    user: {
-      email: 'abc@gmail.com',
-      avatar: '/ic_human.png',
-    },
-  };
-
   return (
     <html lang="en">
       <body

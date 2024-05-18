@@ -13,7 +13,7 @@ const JobDescriptionCard = ({
     company_img_url: string;
     company_name: string;
     company_url: string;
-    location: string;
+    location: string | null;
     post_date: Date;
     due_date: Date | null;
     fields: string;
@@ -50,7 +50,7 @@ const JobDescriptionCard = ({
 
   return (
     <ScrollShadow
-      isEnabled={false}
+      hideScrollBar
       className="w-[660px] z-0 h-[450px] border-3 rounded-md flex flex-col gap-3 bg-white shadow-md text-black p-3"
     >
       <div className="flex flex-row gap-5 items-center">
@@ -115,7 +115,7 @@ const JobDescriptionCard = ({
           </div>
           <div className="w-full h-fit flex flex-col gap-2">
             <p className="font-bold">Requirements</p>
-            <p>{JobDescriptionCard(requirements)}</p>
+            <div>{JobDescriptionCard(requirements)}</div>
           </div>
 
           <div className="w-full h-fit flex flex-col gap-2">

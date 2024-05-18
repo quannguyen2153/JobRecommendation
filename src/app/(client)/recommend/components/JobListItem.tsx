@@ -13,7 +13,7 @@ const JobListItem = ({
     company_name: string;
     company_url: string;
     company_img_url: string;
-    location: string;
+    location: string | null;
     post_date: Date;
     due_date: Date | null;
     fields: string;

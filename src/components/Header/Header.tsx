@@ -57,6 +57,18 @@ export const Header = () => {
         <p className="font-bold text-primary">{Constants.APP_NAME}</p>
       </NavbarBrand>
 
+      <NavbarContent justify="center">
+        <NavbarItem className="hidden lg:flex">
+          <Link href="/">Home</Link>
+        </NavbarItem>
+        <NavbarItem className="hidden lg:flex">
+          <Link href="/">Dashboard</Link>
+        </NavbarItem>
+        <NavbarItem className="hidden lg:flex">
+          <Link href="/">About</Link>
+        </NavbarItem>
+      </NavbarContent>
+
       {user ? (
         <NavbarContent justify="end" className="w-32">
           <Dropdown placement="bottom-end" className="text-black">
