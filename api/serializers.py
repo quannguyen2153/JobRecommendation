@@ -23,6 +23,7 @@ class UserSerializer(serializers.Serializer):
     return UserData(**self.data)
 
 class JobSerializer(serializers.Serializer):
+  id = serializers.IntegerField(min_value=1, required=True)
   job_title = serializers.CharField()
   job_url = serializers.URLField()
   company_name = serializers.CharField()

@@ -18,9 +18,10 @@ class UserData:
     self.deleted = deleted
 
 class JobData:
-  def __init__(self, job_title=None, job_url=None, company_name=None, company_url=None, company_img_url=None, 
+  def __init__(self, id, job_title=None, job_url=None, company_name=None, company_url=None, company_img_url=None, 
                location=None, post_date=None, due_date=None, fields=None, salary=None, position=None, 
                benefits=None, experience=None, job_description=None, requirements=None):
+    self.id = id
     self.job_title = job_title
     self.job_url = job_url
     self.company_name = company_name

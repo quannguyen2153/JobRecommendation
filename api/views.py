@@ -223,7 +223,7 @@ class JobView(APIView):
         status=400
       )
     page = int(form.data.get('page', 1))
-    list_ids = [i for i in range(999)]
+    list_ids = [i + 1 for i in range(999)]
     jobs = JobManager.get_job_dummy(list_ids, page)
     return Response(
       status=200,
