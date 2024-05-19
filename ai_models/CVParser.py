@@ -101,8 +101,10 @@ class CVParser():
     
     @staticmethod
     def parse_cv(cv_pdf_data):
+      try:
         parser = CVParser(config.API_URL, config.TOKEN, config.CV_FORM)
         cv_info_dict = parser.parseFromPDF(cv_pdf_data)
         cv_info_dict = parser.standardizeCVDict(cv_info_dict)
         return cv_info_dict
-        
+      except Exception as e:
+        raise Exception("Parsing error:" + str(e))       
