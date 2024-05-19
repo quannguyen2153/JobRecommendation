@@ -6,6 +6,7 @@ from .models import *
 from .serializers import *
 from .utils import generate_avatar, convert_size
 from ai_models.CVParser import CVParser
+from ai_models.JobChatBot import JobChatBot
 
 firebase_client = pyrebase.initialize_app(FIREBASE_CONFIG)
 
@@ -121,6 +122,13 @@ class JobManager:
     return [JobData(**job) for job in jobs.values()]
 
   @staticmethod
+  def get_job(job_id):
+    '''
+    Get jobs by id from database
+    '''
+    return JobData(**database_client.child("jobs").child(job_id).get().val())
+
+  @staticmethod
   def get_jobs(job_ids):
     '''
     Get jobs by ids from database
@@ -172,6 +180,16 @@ class CVHelper:
 
     CVManager.create(cv, file_info, user_id)
     return file_info
+
+class ChatBotHelper:
+  @staticmethod
+  def send_message(user_id, job_id, message):
+    '''
+    Send message to chatbot
+    '''
+    user_cv = CVManager.get_cv_data(user_id)
+    job = JobManager.get_job(job_id)
+    return JobChatBot.send_message(cv_dict=user_cv.__dict__, job_dict=job.__dict__, message=message) 
 
 class AuthHelper:
   @staticmethod

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 import json
 
 from .forms import *
-from .firebase import UserResourceManager, JobManager, CVManager, AuthHelper, CVHelper
+from .firebase import UserResourceManager, JobManager, CVManager, AuthHelper, CVHelper, ChatBotHelper
 from .serializers import *
 from .authenticate import FirebaseAuthentication
 
@@ -232,3 +232,37 @@ class JobView(APIView):
       "page": page,
       "data": JobSerializer(jobs, many=True).data
     })
+
+class ChatBotView(APIView):
+  '''
+  Get chatbot response
+  '''
+  http_method_names = ['post', 'options']
+  authentication_classes = [FirebaseAuthentication]
+
+  def post(self, request):
+    try:
+      form = ChatBotForm(json.loads(request.body))
+      if not form.is_valid():
+        return Response(
+          data={
+            "success": False, 
+            "message": form.errors.as_data()
+          }, 
+          status=400
+        )
+      return Response(
+        data={
+          "success": True, 
+          "message": ChatBotHelper.send_message(request.user.uid, form.data['job_id'], form.data['message'])
+        }, 
+        status=200
+      )
+    except Exception as e:
+      return Response(
+        data={
+          "success": False, 
+          "message": str(e)
+        }, 
+        status=500
+      )

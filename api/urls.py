@@ -12,4 +12,5 @@ api_urls = [
   path('forgot-password/', views.ForgotPasswordView.as_view()),
   path('user/', include(user_urls)),
   path('jobs/', views.JobView.as_view()),
+  path('chatbot/', views.ChatBotView.as_view()),
 ]

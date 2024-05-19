@@ -14,3 +14,7 @@ class ForgotPasswordForm(forms.Form):
 
 class GetJobsForm(forms.Form):
   page = forms.IntegerField(required=False)
+
+class ChatBotForm(forms.Form):
+  job_id = forms.IntegerField()
+  message = forms.CharField()
