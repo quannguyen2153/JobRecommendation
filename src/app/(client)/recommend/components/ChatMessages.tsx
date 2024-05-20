@@ -1,56 +1,117 @@
 'use client';
 
-import { MessagesContext } from '@/context/messages';
 import { cn } from '@/lib/utils';
-import { FC, HTMLAttributes, useContext } from 'react';
-import MarkdownLite from './MarkdownLite';
+import { ScrollShadow } from '@nextui-org/react';
+import {
+  FC,
+  HTMLAttributes,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-interface ChatMessagesProps extends HTMLAttributes<HTMLDivElement> {}
+interface ChatMessagesProps extends HTMLAttributes<HTMLDivElement> {
+  messages: Message[];
+}
 
-const ChatMessages: FC<ChatMessagesProps> = ({ className, ...props }) => {
-  const { messages } = useContext(MessagesContext);
+const ChatMessages: FC<ChatMessagesProps> = ({
+  className,
+  messages,
+  ...props
+}) => {
   const inverseMessages = [...messages].reverse();
 
+  // Scroll to bottom when new message is added
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  //Multiple drop lines
+  function MultipleLinesParagraph(text: string) {
+    const descriptionWithLineBreaks = text.split('\n').map((text, index) => (
+      <span key={index}>
+        {text}
+        <br />
+      </span>
+    ));
+
+    return <p>{descriptionWithLineBreaks}</p>;
+  }
+
+  // Typing effect
+  const [displayResponse, setDisplayResponse] = useState('');
+  const [completedTyping, setCompletedTyping] = useState(false);
+
+  useEffect(() => {
+    setCompletedTyping(false);
+
+    let i = 0;
+    const stringResponse = inverseMessages[inverseMessages.length - 1].message;
+
+    const intervalId = setInterval(() => {
+      setDisplayResponse(stringResponse.slice(0, i));
+
+      i++;
+
+      if (i > stringResponse.length) {
+        clearInterval(intervalId);
+        setCompletedTyping(true);
+      }
+    }, 20);
+
+    return () => clearInterval(intervalId);
+  }, [inverseMessages]);
   return (
-    <div
-      {...props}
-      className={cn(
-        'flex flex-col-reverse gap-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch',
-        className
-      )}
+    <ScrollShadow
+      ref={chatContainerRef}
+      isEnabled={false}
+      hideScrollBar
+      className={cn('h-[600px] p-2', className)}
     >
-      <div className="flex-1 flex-grow" />
-      {inverseMessages.map((message) => {
-        return (
-          <div className="chat-message" key={`${message.id}-${message.id}`}>
+      <div {...props} className={cn('flex flex-col-reverse gap-3 ', className)}>
+        <div className="flex-1" />
+        {inverseMessages.map((message) => {
+          return (
             <div
-              className={cn('flex items-end', {
-                'justify-end': message.isUserMessage,
-              })}
+              className="chat-message"
+              key={`${message.jobId}-${message.message}`}
             >
               <div
-                className={cn(
-                  'flex flex-col space-y-2 text-sm max-w-xs mx-2 overflow-x-hidden',
-                  {
-                    'order-1 items-end': message.isUserMessage,
-                    'order-2 items-start': !message.isUserMessage,
-                  }
-                )}
+                className={cn('flex items-end', {
+                  'justify-end': message.isUserMessage,
+                })}
               >
-                <p
-                  className={cn('px-4 py-2 rounded-lg', {
-                    'bg-blue-600 text-white': message.isUserMessage,
-                    'bg-gray-200 text-gray-900': !message.isUserMessage,
-                  })}
+                <div
+                  className={cn(
+                    'flex flex-col space-y-2 text-sm max-w-xl mx-2 overflow-x-hidden shadow-md rounded-lg',
+                    {
+                      'order-1 items-end': message.isUserMessage,
+                      'order-2 items-start': !message.isUserMessage,
+                    }
+                  )}
                 >
-                  <MarkdownLite text={message.text} />
-                </p>
+                  <p
+                    className={cn('px-4 py-2 rounded-lg', {
+                      'bg-gradient-to-r from-primary-400 to-primary text-white':
+                        message.isUserMessage,
+                      'bg-gradient-to-l from-slate-400 to-slate-500 text-zinc-100':
+                        !message.isUserMessage,
+                    })}
+                  >
+                    {MultipleLinesParagraph(message.message)}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>{' '}
+    </ScrollShadow>
   );
 };
 

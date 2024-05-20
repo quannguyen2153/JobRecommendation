@@ -39,6 +39,8 @@ const RecommendPage = () => {
     if (jobData) {
       console.log('🚀 ~ useEffect ~ jobData:', jobData);
       setTotalPage(Math.round(jobData.total / itemsPerPage));
+      //Set selected job as first job in the list
+      setSelectedJob(jobData.data[0]);
     }
   }, [jobData]);
   //Page change when click on pagination
@@ -54,6 +56,7 @@ const RecommendPage = () => {
   ];
   //Selected job description data
   const [selectedJob, setSelectedJob] = useState(null);
+  console.log('🚀 ~ RecommendPage ~ selectedJob:', selectedJob);
 
   //CV state
   const [cvFile, setCvFile] = useState([]);
@@ -154,25 +157,29 @@ const RecommendPage = () => {
             setOpen={setOpen}
           />
 
-          <div className="w-full min-h-screen p-8 flex flex-row gap-3 bg-secondary z-0">
+          <div className="w-full h-fit p-8 flex flex-row gap-3 bg-secondary z-0">
             {uploadedcvLink && jobData ? (
-              <JobList
-                jobData={jobData}
-                filterOptions={filterOptions}
-                setFilter={setFilter}
-                showJobDescriptionModal={showJobDescriptionModal}
-                selectedJob={selectedJob}
-                setShowJobDescriptionModal={setShowJobDescriptionModal}
-                setSelectedJob={setSelectedJob}
-                totalPage={totalPage}
-                currentPage={currentPage}
-                onPageChange={onPageChange}
-              ></JobList>
+              <div className="flex-1 w-[50%]">
+                <JobList
+                  jobData={jobData}
+                  filterOptions={filterOptions}
+                  setFilter={setFilter}
+                  showJobDescriptionModal={showJobDescriptionModal}
+                  selectedJob={selectedJob}
+                  setShowJobDescriptionModal={setShowJobDescriptionModal}
+                  setSelectedJob={setSelectedJob}
+                  totalPage={totalPage}
+                  currentPage={currentPage}
+                  onPageChange={onPageChange}
+                ></JobList>
+              </div>
             ) : uploadedcvLink && !jobData ? (
               <SkeletonLoader />
             ) : null}
 
-            <Chat />
+            <div className="flex-1 w-[50%]">
+              <Chat selectedJob={selectedJob} />
+            </div>
           </div>
 
           <div className="flex h-0 w-0 flex-col gap-y-4 justify-center overflow-hidden">

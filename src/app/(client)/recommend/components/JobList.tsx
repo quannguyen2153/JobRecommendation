@@ -28,7 +28,7 @@ const JobList = ({
   onPageChange: any;
 }) => {
   return (
-    <div className="w-[50%] h-full flex flex-col z-10">
+    <div className="flex flex-col z-10">
       <div className="w-full h-fit flex flex-row justify-between items-center">
         <p className="font-bold text-lg text-black">{jobData?.total} Jobs</p>
         <Select
@@ -76,6 +76,9 @@ const JobList = ({
                   }}
                   onMouseLeave={() => {
                     setShowJobDescriptionModal(false);
+                  }}
+                  onClick={() => {
+                    setSelectedJob(item);
                   }}
                 >
                   <JobListItem

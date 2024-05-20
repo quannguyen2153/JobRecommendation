@@ -1,8 +1,7 @@
 'use client';
 
-import { MessagesContext } from '@/context/messages';
+import { useChat } from '@/hooks/useChat';
 import { cn } from '@/lib/utils';
-import { Message } from '@/lib/validators';
 
 import { useMutation } from '@tanstack/react-query';
 import { CornerDownLeft, Loader2 } from 'lucide-react';
@@ -11,74 +10,75 @@ import { FC, HTMLAttributes, useContext, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import TextareaAutosize from 'react-textarea-autosize';
 
-interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {}
+interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {
+  selectedJob: any;
+  messages: Message[];
+  setMessages: (messages: Message[]) => void;
+  setIsMessageUpdating: (isUpdating: boolean) => void;
+}
 
-const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
+const ChatInput: FC<ChatInputProps> = ({
+  className,
+  selectedJob,
+  messages,
+  setMessages,
+  setIsMessageUpdating,
+  ...props
+}) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [input, setInput] = useState<string>('');
-  const {
-    messages,
-    addMessage,
-    removeMessage,
-    updateMessage,
-    setIsMessageUpdating,
-  } = useContext(MessagesContext);
+
+  const { onPostChat } = useChat();
 
   const { mutate: sendMessage, isLoading } = useMutation({
     mutationKey: ['sendMessage'],
     // include message to later use it in onMutate
-    mutationFn: async (_message: Message) => {
-      const response = await fetch('/api/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ messages }),
+    mutationFn: async (inputText: string) => {
+      const response = await onPostChat({
+        job_id: selectedJob.id,
+        message: inputText,
       });
-
-      return response.body;
+      console.log('🚀 ~ onPostChat ~ response:', response);
+      const responseMessage = {
+        id: nanoid(),
+        isUserMessage: false,
+        message: response.message,
+        jobId: selectedJob.id,
+      };
+      setMessages([...messages, responseMessage]);
+      return responseMessage;
     },
-    onMutate(message) {
-      addMessage(message);
+    onMutate: (inputText: string) => {
+      setIsMessageUpdating(true);
+      const message: Message = {
+        id: nanoid(),
+        isUserMessage: true,
+        message: inputText,
+        jobId: selectedJob.id,
+      };
+      setMessages([...messages, message]);
+      setInput('');
     },
     onSuccess: async (stream) => {
       if (!stream) throw new Error('No stream');
 
-      // construct new message to add
-      const id = nanoid();
-      const responseMessage: Message = {
-        id,
-        isUserMessage: false,
-        text: '',
-      };
-
-      // add new message to state
-      addMessage(responseMessage);
-
-      setIsMessageUpdating(true);
-
-      const reader = stream.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-
-      while (!done) {
-        const { value, done: doneReading } = await reader.read();
-        done = doneReading;
-        const chunkValue = decoder.decode(value);
-        updateMessage(id, (prev) => prev + chunkValue);
-      }
-
-      // clean up
       setIsMessageUpdating(false);
+
       setInput('');
 
       setTimeout(() => {
         textareaRef.current?.focus();
       }, 10);
     },
-    onError: (_, message) => {
+    onError: (_, inputText) => {
       toast.error('Something went wrong. Please try again.');
-      removeMessage(message.id);
+      const message: Message = {
+        id: nanoid(),
+        isUserMessage: true,
+        message: inputText,
+        jobId: selectedJob.id,
+      };
+      setMessages(messages.filter((msg) => msg.id !== message.id));
       textareaRef.current?.focus();
     },
   });
@@ -92,19 +92,15 @@ const ChatInput: FC<ChatInputProps> = ({ className, ...props }) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
 
-              const message: Message = {
-                id: nanoid(),
-                isUserMessage: true,
-                text: input,
-              };
-
-              sendMessage(message);
+              if (input !== '') {
+                const inputText = input.trim();
+                sendMessage(inputText);
+              }
             }
           }}
           rows={2}
           maxRows={4}
           value={input}
-          autoFocus
           disabled={isLoading}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Write a message..."
