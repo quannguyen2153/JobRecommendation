@@ -157,8 +157,8 @@ const RecommendPage = () => {
             setOpen={setOpen}
           />
 
-          <div className="w-full h-fit p-8 flex flex-row gap-3 bg-secondary z-0">
-            {uploadedcvLink && jobData ? (
+          {uploadedcvLink && jobData ? (
+            <div className="w-full h-fit p-8 flex flex-row gap-3 bg-secondary z-0">
               <div className="flex-1 w-[50%]">
                 <JobList
                   jobData={jobData}
@@ -173,14 +173,13 @@ const RecommendPage = () => {
                   onPageChange={onPageChange}
                 ></JobList>
               </div>
-            ) : uploadedcvLink && !jobData ? (
-              <SkeletonLoader />
-            ) : null}
-
-            <div className="flex-1 w-[50%]">
-              <Chat selectedJob={selectedJob} />
+              <div className="flex-1 w-[50%]">
+                <Chat selectedJob={selectedJob} />
+              </div>
             </div>
-          </div>
+          ) : uploadedcvLink && !jobData ? (
+            <SkeletonLoader />
+          ) : null}
 
           <div className="flex h-0 w-0 flex-col gap-y-4 justify-center overflow-hidden">
             <div className="flex flex-row gap-x-4 items-center font-bold ">

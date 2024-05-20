@@ -1,1 +1,1 @@
-export const Constants = { APP_NAME: 'Oppurtuno' };
+export const Constants = { APP_NAME: 'Opportuno' };

@@ -62,10 +62,7 @@ export const Header = () => {
           <Link href="/">Home</Link>
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">
-          <Link href="/">Dashboard</Link>
-        </NavbarItem>
-        <NavbarItem className="hidden lg:flex">
-          <Link href="/">About</Link>
+          <Link href="/dashboard">Dashboard</Link>
         </NavbarItem>
       </NavbarContent>
 

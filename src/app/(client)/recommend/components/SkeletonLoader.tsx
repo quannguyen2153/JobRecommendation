@@ -5,8 +5,8 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 const SkeletonLoader = () => {
   return (
-    <div className="w-[50%] h-full">
-      <div className="w-full h-full rounded-2xl flex flex-col">
+    <div className="w-full h-full p-8 gap-3">
+      <div className="w-[50%] h-full rounded-2xl flex flex-col">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
             id={index.toString()}

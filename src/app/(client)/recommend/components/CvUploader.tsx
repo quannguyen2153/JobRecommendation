@@ -15,7 +15,7 @@ const CvUploader = ({
   uploadedcvLink: string;
   uploadedcvName: string;
   uploadedcvSize: string;
-  uploadedcvAt: Date;
+  uploadedcvAt: number;
   cvFile: File[];
   onUploadingCv: () => void;
   setOpen: (value: boolean) => void;
@@ -92,7 +92,7 @@ const CvUploader = ({
               {uploadedcvName} ( {uploadedcvSize} )
             </Button>
             <p className="text-[#858585]">
-              Last modified: {new Date(uploadedcvAt).toUTCString()}{' '}
+              Last modified: {new Date(uploadedcvAt * 1000).toLocaleString()}{' '}
             </p>
             <div className="w-full h-fit flex flex-row justify-center items-center gap-4">
               <Button
