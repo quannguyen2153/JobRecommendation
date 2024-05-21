@@ -135,15 +135,6 @@ class JobManager:
     Get jobs by ids from database
     '''
     return [JobData(**database_client.child("jobs").child(id).get().val()) for id in job_ids]
-  
-  @staticmethod
-  def get_job_dummy(list_ids, page):
-    '''
-    Get jobs dummy
-    '''
-    start = (page - 1) * PAGE_SIZE
-    end = page * PAGE_SIZE
-    return JobManager.get_jobs(list_ids[start:end])
 
 class JobRecommenderDataManager:
   @staticmethod
