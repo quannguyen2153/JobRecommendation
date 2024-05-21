@@ -3,47 +3,16 @@ import re
 import json
 import copy
 from io import BytesIO
-from transformers import AutoTokenizer
 
 import ai_models.config as config
-from ai_models.TextGenerator import TextGenerator
+from .CVParserGPT import CVParserGPT
 
 class CVParser():
-    def __init__(self, model_url, token, cv_format):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_url, token=token)
+    def __init__(self, model):
+        self.model = model
         
-        api_url = 'https://api-inference.huggingface.co/models/' + model_url  
-        self.text_generator = TextGenerator(api_url=api_url, token=token)
-        
-        self.cv_format = cv_format
-        
-        # Calculate the number of tokens of cv format in advance        
-        tokens = self.tokenizer.tokenize(self.cv_format)
-        self.cv_format_tokens = len(tokens)
-        
-    def extractInformation(self, cv_raw_text, threshold_tokens=1000):
-        # Construct extraction message to get the information in JSON format (cv_raw + request + cv_format)
-        cv_extraction_msg = '\"' + cv_raw_text \
-                            + '\"\n---\nExtract information from this CV into the following JSON format with utf-8 encoding:\n' \
-                            + self.cv_format
-        
-        # Calculate the number of tokens of cv raw text in advance                    
-        tokens = self.tokenizer.tokenize(cv_raw_text)
-        cv_tokens = len(tokens)
-        total_tokens = cv_tokens + self.cv_format_tokens
-                            
-        # Construct extraction payload
-        cv_extraction_payload = {
-            "inputs": cv_extraction_msg,
-            "parameters": {
-                "max_new_tokens": threshold_tokens if total_tokens < threshold_tokens else total_tokens,
-                "return_full_text": False
-            }
-        }
-        
-        # Get CV information in JSON format
-        cv_extraction_output = self.text_generator.query(payload=cv_extraction_payload)
-
+    def extractInformation(self, cv_raw_text):
+        cv_extraction_output = self.model.query(cv_text=cv_raw_text)
         return cv_extraction_output
     
     def extractJSONFromText(self, text):
@@ -93,7 +62,7 @@ class CVParser():
                 
         return standardized_cv_dict
     
-    def parseFromPDF(self, cv_pdf_data, extract_json=True, threshold_tokens=1000):
+    def parseFromPDF(self, cv_pdf_data, extract_json=True):
         # Read raw text from PDF and merge multiple pages into a single string
         pages = []
         pdf_reader = PyPDF2.PdfReader(BytesIO(cv_pdf_data))
@@ -105,7 +74,7 @@ class CVParser():
         cv_raw_text = '\n'.join(pages)
 
         # Extract cv info as a string
-        cv_info = self.extractInformation(cv_raw_text=cv_raw_text, threshold_tokens=threshold_tokens)
+        cv_info = self.extractInformation(cv_raw_text=cv_raw_text)
         
         # Extract cv info as a dict
         if extract_json:
@@ -116,7 +85,8 @@ class CVParser():
     @staticmethod
     def parse_cv(cv_pdf_data):
       try:
-        parser = CVParser(model_url=config.LLAMA_MODEL_URL, token=config.LLAMA_TOKEN, cv_format=config.CV_JSON_FORMAT)
+        parser_gpt_model = CVParserGPT(model_name=config.GPT_MODEL_NAME, token=config.GPT_TOKEN, cv_format=config.CV_JSON_FORMAT)
+        parser = CVParser(model=parser_gpt_model)
         cv_info_dict = parser.parseFromPDF(cv_pdf_data)
         cv_info_dict = parser.standardizeCVDict(cv_info_dict)
         return cv_info_dict
