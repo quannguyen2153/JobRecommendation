@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class JobChatBotModel(ABC):
     @abstractmethod
-    def attachJob(self, job_text):
+    def attachJob(self, job_text, topic):
         pass
     
     @abstractmethod

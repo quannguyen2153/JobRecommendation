@@ -1,25 +1,10 @@
 class JobChatBot():
-    def __init__(self, model, lang):
+    def __init__(self, model):
         self.model = model
-        self.lang = lang
         
-    def selectTopic(self, topic):
-        # topic=None means all job's information are considered
-        
-        self.topic = topic
-        self.model.selectTopic(self.topic)
-        
-        # Change the model's job text to the selected topic
-        if hasattr(self, 'job_dict'):
-            if self.topic is not None:
-                self.job_text = self.extractTopicFromJobDict(job_dict=self.job_dict, topic=self.topic)
-            else:                    
-                self.job_text = self.extractJobDictToText(job_dict=self.job_dict, lang=self.lang)
-                
-            self.model.attachJob(self.job_text)
-        
-    def attachJob(self, job_dict):
+    def attachJob(self, job_dict, topic=None):
         self.job_dict = job_dict
+        self.topic = topic
         
         # Change the model's job text to the selected topic        
         if self.topic is not None:
@@ -27,20 +12,16 @@ class JobChatBot():
         else:                    
             self.job_text = self.extractJobDictToText(job_dict=self.job_dict)
         
-        self.model.attachJob(self.job_text)
+        self.model.attachJob(job_text=self.job_text, topic=self.topic)
         
     def extractTopicFromJobDict(self, job_dict, topic):
         return job_dict[topic]
         
     def extractJobDictToText(self, job_dict):
-        org_extract_keys = ['job_title',
-                            'job_description',
-                            'requirements']
-        en_extract_keys = ['en_title',
-                           'en_description',
-                           'en_requirements']
-        
-        extract_keys = en_extract_keys if self.lang == 'en' else org_extract_keys
+        extract_keys = ['job_title',
+                        'job_description',
+                        'benefits',
+                        'requirements']
         
         # Get necessary information
         extracted_job_dict = {}

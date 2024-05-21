@@ -11,11 +11,9 @@ class JobLlama(JobChatBotModel):
         # Text Generator for querying
         api_url = 'https://api-inference.huggingface.co/models/' + model_url        
         self.text_generator = TextGenerator(api_url=api_url, token=token)
-        
-    def selectTopic(self, topic):
-        self.topic = topic
     
-    def attachJob(self, job_text):
+    def attachJob(self, job_text, topic):
+        self.topic = topic if topic is not None else 'Job\'s Information'
         self.job_text = job_text
         
         # Calculate the number of tokens of job text in advance
