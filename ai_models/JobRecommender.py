@@ -14,16 +14,15 @@ class JobRecommender():
     def attachCV(self, cv_dict):
         self.cv = cv_dict        
         self.cv_text = self.extractCVDictToText()
-        
         self.cv_profession_encoded = self.model.encode(self.cv['profession'])
         self.cv_text_encoded = self.model.encode(self.cv_text)
         
     def extractCVDictToText(self):
-        extract_keys=[('Candidate\'s Profession', 'profession'),
-                      ('Candidate\'s Skills', 'skills'),
-                      ('Candidate\'s Experiences', 'experiences'),
-                      ('Candidate\'s Education', 'education'),
-                      ('Candidate\'s Certificates', 'certificates')]
+        extract_keys=[('Profession', 'profession'),
+                      ('Skills', 'skills'),
+                      ('Experiences', 'experiences'),
+                      ('Education', 'education'),
+                      ('Certificates', 'certificates')]
         extracted_cv_dict = {}
         
         for dst_key, src_key in extract_keys:
@@ -79,7 +78,9 @@ def recommend_jobs(cv_dict):
   Recommend jobs based on CV
   Return list of job ids
   '''
-  job_recommender.attachCV(cv_dict=cv_dict)
-  similarity_job_df = job_recommender.computeJobsSimilarity(sort=True, top_f=2)
-
-  return similarity_job_df['id'].values.tolist()
+  try:
+    job_recommender.attachCV(cv_dict=cv_dict)
+    similarity_job_df = job_recommender.computeJobsSimilarity(sort=True, top_f=2)
+    return similarity_job_df['id'].values.tolist()
+  except Exception as e:
+    raise Exception(f"Failed to recommend jobs: {str(e)}")
