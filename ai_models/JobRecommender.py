@@ -12,21 +12,21 @@ class JobRecommender():
         self.job_df = job_df
         
     def attachCV(self, cv_dict):
-        self.cv = cv_dict        
-        self.cv_text = self.extractCVDictToText()
-        self.cv_profession_encoded = self.model.encode(self.cv['profession'])
+        self.cv_dict = cv_dict        
+        self.cv_text = self.extractCVDictToText(cv_dict=self.cv_dict)
+        self.cv_profession_encoded = self.model.encode(self.cv_dict['Profession'])
         self.cv_text_encoded = self.model.encode(self.cv_text)
         
-    def extractCVDictToText(self):
-        extract_keys=[('Profession', 'profession'),
-                      ('Skills', 'skills'),
-                      ('Experiences', 'experiences'),
-                      ('Education', 'education'),
-                      ('Certificates', 'certificates')]
+    def extractCVDictToText(self, cv_dict):
+        extract_keys=['Profession',
+                      'Skills',
+                      'Experiences',
+                      'Education',
+                      'Certificates']
         extracted_cv_dict = {}
         
-        for dst_key, src_key in extract_keys:
-            extracted_cv_dict[dst_key] = self.cv[src_key]
+        for key in extract_keys:
+            extracted_cv_dict[key] = cv_dict[key]
                 
         cv_text = ''
         for key, value in extracted_cv_dict.items():
@@ -84,3 +84,14 @@ def recommend_jobs(cv_dict):
     return similarity_job_df['id'].values.tolist()
   except Exception as e:
     raise Exception(f"Failed to recommend jobs: {str(e)}")
+
+from CVParser import CVParser
+
+with open('ai_models/sample_cv2.pdf', 'rb') as file:
+    cv_pdf_data = file.read()
+
+cv_dict = CVParser.parse_cv(cv_pdf_data=cv_pdf_data)
+print(cv_dict)
+
+df = recommend_jobs(cv_dict)
+print(df)

@@ -28,5 +28,4 @@ class JobGPT(JobChatBotModel):
             ]
         )
         
-        print(response.usage.total_tokens)
         return response.choices[0].message.content

@@ -47,17 +47,17 @@ class JobChatBot():
         self.model.attachCV(self.cv_text)
         
     def extractCVDictToText(self, cv_dict):
-        extract_keys=[('Profession', 'profession'),
-                      ('Skills', 'skills'),
-                      ('Experiences', 'experiences'),
-                      ('Education', 'education'),
-                      ('Certificates', 'certificates')]
+        extract_keys=['Profession',
+                      'Skills',
+                      'Experiences',
+                      'Education',
+                      'Certificates']
         
         # Get necessary information
         extracted_cv_dict = {}
         
-        for dst_key, src_key in extract_keys:
-            extracted_cv_dict[dst_key] = cv_dict[src_key]
+        for key in extract_keys:
+            extracted_cv_dict[key] = cv_dict[key]
 
         # Convert to text     
         cv_text = ''
