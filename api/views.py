@@ -4,7 +4,7 @@ from rest_framework.response import Response
 import json
 
 from .forms import *
-from .firebase import UserResourceManager, JobManager, CVManager, AuthHelper, CVHelper, ChatBotHelper
+from .firebase import UserResourceManager, CVManager, AuthHelper, CVHelper, ChatBotHelper, JobHelper
 from .serializers import *
 from .authenticate import FirebaseAuthentication
 
@@ -171,7 +171,6 @@ class UserCVView(APIView):
       cv_file = request.FILES['file']
       file_info = CVHelper.upload_and_process_cv(cv_file, request.user.uid, request.auth)
     except Exception as e:
-      raise e
       return Response(
         data={
           "success": False, 
@@ -210,6 +209,7 @@ class JobView(APIView):
   Get jobs details
   '''
   http_method_names = ['get', 'options']
+  authentication_classes = [FirebaseAuthentication]
 
   def get(self, request):
     request_data = request.query_params
@@ -223,14 +223,13 @@ class JobView(APIView):
         status=400
       )
     page = int(form.data.get('page', 1))
-    list_ids = [i + 1 for i in range(999)]
-    jobs = JobManager.get_job_dummy(list_ids, page)
+    jobs, total = JobHelper.get_recommended_jobs(request.user.uid, page)
     return Response(
       status=200,
       data={
-      "total": len(list_ids),
-      "page": page,
-      "data": JobSerializer(jobs, many=True).data
+        "total": total,
+        "page": page,
+        "data": JobSerializer(jobs, many=True).data
     })
 
 class ChatBotView(APIView):

@@ -7,6 +7,7 @@ from .serializers import *
 from .utils import generate_avatar, convert_size
 from ai_models.CVParser import CVParser
 from ai_models.JobChatBot import JobChatBot
+import ai_models.JobRecommender as JobRecommender
 
 firebase_client = pyrebase.initialize_app(FIREBASE_CONFIG)
 
@@ -144,6 +145,22 @@ class JobManager:
     end = page * PAGE_SIZE
     return JobManager.get_jobs(list_ids[start:end])
 
+class JobRecommenderDataManager:
+  @staticmethod
+  def get_recommendations(user_id):
+    '''
+    Get job recommendations by user_id from database
+    '''
+    return database_client.child("recommendations").child(user_id).get().val()
+  
+  @staticmethod
+  def save_recommendations(user_id, job_ids):
+    '''
+    Create job recommendations in database
+    '''
+    database_client.child("recommendations").child(user_id).set(job_ids)
+    return
+
 class CVHelper:
   '''
   Helper class for uploading and processing CV
@@ -166,19 +183,21 @@ class CVHelper:
     download_url = UserResourceManager.upload_file("cv.pdf", data, user_id, token)
     if download_url is None:
       raise Exception("Failed to upload file.")
-    
-    # Process CV data and save to database
     file_info = CVFileInfoSerializer(data={
       "file_name": file_name,
       "file_size": file_size,
       "file_url": download_url,
       "uploaded_at": int(datetime.now().timestamp())
     }).create()
-
+    
+    # Process CV data and save results to database
     parsed_data = CVParser.parse_cv(data)
     cv = CVDataSerializer(parsed_data).create()
-
     CVManager.create(cv, file_info, user_id)
+
+    recommended_jobs = JobRecommender.recommend_jobs(cv.__dict__)
+    JobRecommenderDataManager.save_recommendations(user_id, recommended_jobs)
+
     return file_info
 
 class ChatBotHelper:
@@ -247,3 +266,20 @@ class AuthHelper:
     """
     auth_client.send_password_reset_email(email)
     return
+
+class JobHelper:
+  @staticmethod
+  def get_recommended_jobs(user_id, page = None):
+    '''
+    Get recommended jobs by user_id
+    Return: jobs in requested page, total number of jobs
+    '''
+    recommended_job_ids = JobRecommenderDataManager.get_recommendations(user_id)
+    
+    total = len(recommended_job_ids)
+    if page is None:
+      return JobManager.get_jobs(recommended_job_ids), total
+    else:
+      start = (page - 1) * PAGE_SIZE
+      end = page * PAGE_SIZE
+      return JobManager.get_jobs(recommended_job_ids[start:end]), total
