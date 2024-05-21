@@ -1,7 +1,6 @@
-from JobChatBotModel import JobChatBotModel
-
 from transformers import AutoTokenizer
-from TextGenerator import TextGenerator
+from .JobChatBotModel import JobChatBotModel
+from .TextGenerator import TextGenerator
 
 class JobLlama(JobChatBotModel):
     def __init__(self, model_url, token):

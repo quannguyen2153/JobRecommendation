@@ -1,4 +1,4 @@
-from JobGPT import JobGPT
+from .JobGPT import JobGPT
 
 from .config import GPT_MODEL_NAME, GPT_TOKEN
 

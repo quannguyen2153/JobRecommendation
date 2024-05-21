@@ -1,4 +1,4 @@
-from JobChatBotModel import JobChatBotModel
+from .JobChatBotModel import JobChatBotModel
 
 from openai import OpenAI
 
