@@ -1,16 +1,18 @@
 from JobChatBotModel import JobChatBotModel
 
 from transformers import AutoTokenizer
-from TextGenerator import TextGenerator
+
+import requests
 
 class JobLlama(JobChatBotModel):
     def __init__(self, model_url, token):
         # Tokenizer for calculating the number of tokens
         self.tokenizer = AutoTokenizer.from_pretrained(model_url, token=token)
         
-        # Text Generator for querying
-        api_url = 'https://api-inference.huggingface.co/models/' + model_url        
-        self.text_generator = TextGenerator(api_url=api_url, token=token)
+        # Llama authentication
+        self.api_url = 'https://api-inference.huggingface.co/models/' + model_url
+        self.token = token        
+        self.headers = {"Authorization": f"Bearer {self.token}"}
     
     def attachJob(self, job_text, topic):
         self.topic = topic if topic is not None else 'Job\'s Information'
@@ -43,6 +45,7 @@ class JobLlama(JobChatBotModel):
         }
         
         # Get response message
-        response = self.text_generator.query(payload=payload)
+        response = requests.post(self.api_url, headers=self.headers, json=payload)        
+        response = response.json()[0]['generated_text'].strip()
 
-        return response.strip()
+        return response
