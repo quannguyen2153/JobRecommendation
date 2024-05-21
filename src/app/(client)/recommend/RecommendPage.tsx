@@ -55,6 +55,7 @@ const RecommendPage = () => {
     { id: 2, option: 'Oldest' },
   ];
   //Selected job description data
+  const [hoveredJob, setHoveredJob] = useState(null);
   const [selectedJob, setSelectedJob] = useState(null);
   console.log('🚀 ~ RecommendPage ~ selectedJob:', selectedJob);
 
@@ -63,7 +64,9 @@ const RecommendPage = () => {
   const [uploadedcvLink, setUploadedCvLink] = useState(''); //uploaded cv file link
   const [uploadedcvName, setUploadedCvName] = useState(''); //uploaded cv file name
   const [uploadedcvSize, setUploadedCvSize] = useState(''); //uploaded cv file size
-  const [uploadedcvAt, setUploadedCvAt] = useState<Date>(new Date()); //uploaded cv file at [date]
+  const [uploadedcvAt, setUploadedCvAt] = useState<number>(
+    new Date().getMilliseconds()
+  ); //uploaded cv file at [date]
   //useUser hook
   const { onGetCv, onPostCv } = useUser();
   const getUploadedcvFile = async () => {
@@ -84,6 +87,28 @@ const RecommendPage = () => {
   //CV modal state
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  //Message for uploading cv loader
+  const messages = [
+    'Uploading your CV...',
+    'Processing your CV...',
+    'Finding the most suitable jobs...',
+  ];
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % messages.length);
+    }, 4000); // Change text every 4 seconds
+
+    return () => clearInterval(timer); // Clean up timer on component unmount
+  }, []);
+
+  useEffect(() => {
+    if (!uploading) {
+      setCurrentMessageIndex(0); // Reset index when upload completes
+    }
+  }, [uploading]);
+
   const onUploadingCv = async () => {
     if (cvFile.length > 0) {
       console.log('uploading', cvFile[0]);
@@ -106,6 +131,9 @@ const RecommendPage = () => {
       }
     }
   };
+  useEffect(() => {
+    refetch();
+  }, [uploading]);
 
   //Job description modal state
   const [showJobDescriptionModal, setShowJobDescriptionModal] = useState(false);
@@ -141,7 +169,7 @@ const RecommendPage = () => {
               labelColor="primary"
             />
             <div className="text-center font-semibold text-xs sm:text-sm text-black">
-              Uploading your CV...
+              {messages[currentMessageIndex]}
             </div>
           </div>
         </DialogCustom>
@@ -156,10 +184,11 @@ const RecommendPage = () => {
             cvFile={cvFile}
             setOpen={setOpen}
           />
-
-          {uploadedcvLink && jobData ? (
+          {(uploadedcvLink && !jobData) || isFetching ? (
+            <SkeletonLoader />
+          ) : uploadedcvLink && jobData ? (
             <div className="w-full h-fit p-8 flex flex-row gap-3 bg-secondary z-0">
-              <div className="flex-1 w-[50%]">
+              <div className="w-[50%]">
                 <JobList
                   jobData={jobData}
                   filterOptions={filterOptions}
@@ -167,18 +196,18 @@ const RecommendPage = () => {
                   showJobDescriptionModal={showJobDescriptionModal}
                   selectedJob={selectedJob}
                   setShowJobDescriptionModal={setShowJobDescriptionModal}
+                  hoveredJob={hoveredJob}
+                  setHoveredJob={setHoveredJob}
                   setSelectedJob={setSelectedJob}
                   totalPage={totalPage}
                   currentPage={currentPage}
                   onPageChange={onPageChange}
                 ></JobList>
               </div>
-              <div className="flex-1 w-[50%]">
+              <div className="w-[50%]">
                 <Chat selectedJob={selectedJob} />
               </div>
             </div>
-          ) : uploadedcvLink && !jobData ? (
-            <SkeletonLoader />
           ) : null}
 
           <div className="flex h-0 w-0 flex-col gap-y-4 justify-center overflow-hidden">

@@ -6,9 +6,9 @@ import JobDescriptionCard from './JobDescriptionCard';
 
 const JobList = ({
   jobData,
-  filterOptions,
-  setFilter,
   showJobDescriptionModal,
+  hoveredJob,
+  setHoveredJob,
   selectedJob,
   setShowJobDescriptionModal,
   setSelectedJob,
@@ -20,6 +20,8 @@ const JobList = ({
   filterOptions: any;
   setFilter: any;
   showJobDescriptionModal: boolean;
+  hoveredJob: any;
+  setHoveredJob: any;
   selectedJob: any;
   setShowJobDescriptionModal: any;
   setSelectedJob: any;
@@ -28,10 +30,12 @@ const JobList = ({
   onPageChange: any;
 }) => {
   return (
-    <div className="flex flex-col z-10">
+    <div className="flex flex-col z-20">
       <div className="w-full h-fit flex flex-row justify-between items-center">
-        <p className="font-bold text-lg text-black">{jobData?.total} Jobs</p>
-        <Select
+        <p className="font-bold text-lg text-black">
+          Total Jobs: {jobData?.total}
+        </p>
+        {/* <Select
           className="w-fit"
           style={{ width: '15rem', zIndex: 0 }}
           key={'type'}
@@ -54,9 +58,9 @@ const JobList = ({
               {c.option}
             </SelectItem>
           ))}
-        </Select>
+        </Select> */}
       </div>
-      <div className="w-full flex flex-col justify-center items-center">
+      <div className="w-full flex flex-col justify-center items-center z-20">
         {
           <div className="w-full h-fit z-0">
             {Array.isArray(jobData?.data) &&
@@ -65,14 +69,14 @@ const JobList = ({
                   key={item.job_url}
                   className={`w-full h-fit flex flex-row items-center justify-between my-2 relative ${
                     showJobDescriptionModal &&
-                    selectedJob?.job_url === item.job_url
+                    hoveredJob?.job_url === item.job_url
                       ? 'z-20'
                       : 'z-0'
                   }`}
                   // onClick={() => onJobClick(item)}
                   onMouseEnter={() => {
                     setShowJobDescriptionModal(true);
-                    setSelectedJob(item);
+                    setHoveredJob(item);
                   }}
                   onMouseLeave={() => {
                     setShowJobDescriptionModal(false);
@@ -86,7 +90,7 @@ const JobList = ({
                     isSelected={selectedJob?.job_url === item.job_url}
                   />{' '}
                   {showJobDescriptionModal &&
-                    selectedJob?.job_url === item.job_url && (
+                    hoveredJob?.job_url === item.job_url && (
                       <div
                         className={`z-10 absolute ${
                           index >= 3

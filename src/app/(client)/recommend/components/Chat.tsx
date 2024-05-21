@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ChatHeader from './ChatHeader';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
@@ -18,9 +18,13 @@ const Chat = ({ selectedJob }) => {
   console.log('🚀 ~ Chat ~ messages:', messages);
   const [isMessageUpdating, setIsMessageUpdating] = useState<boolean>(false);
 
+  useEffect(() => {
+    setMessages(defaultValue);
+  }, [selectedJob]);
+
   return (
-    <div className="w-full z-0 h-full flex flex-col rounded-lg bg-white justify-between">
-      <div className="h-[85%] flex flex-col ">
+    <div className="w-full h-[70%] z-0  flex flex-col rounded-lg bg-white justify-between">
+      <div className="h-[80%] flex flex-col z-0">
         <ChatHeader></ChatHeader>
         <ChatMessages messages={messages}></ChatMessages>
       </div>
@@ -35,10 +39,11 @@ const Chat = ({ selectedJob }) => {
       )}
 
       <ChatInput
-        className="h-[5%] p-3 z-0 flex items-end justify-center"
+        className="h-[15%] p-3 z-0 flex items-end justify-center"
         selectedJob={selectedJob}
         messages={messages}
         setMessages={setMessages}
+        isMessageUpdating={isMessageUpdating}
         setIsMessageUpdating={setIsMessageUpdating}
       ></ChatInput>
     </div>

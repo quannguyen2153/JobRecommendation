@@ -27,6 +27,11 @@ const nextConfig = {
                 hostname: '*.careerviet.vn',
                 pathname: '**',
             },
+            {
+                protocol: 'https',
+                hostname: '*.vietnamworks.com',
+                pathname: '**',
+            },
         ],
     },
     /* config options here */

@@ -2,6 +2,8 @@ import React from 'react';
 import Image from 'next/image';
 import { AssetSvg } from '@/assets/AssetSvg';
 import { removeBrackets } from '@/lib/utils';
+import { FaRobot } from 'react-icons/fa6';
+import { Icon } from 'lucide-react';
 
 const JobListItem = ({
   data,
@@ -60,6 +62,11 @@ const JobListItem = ({
           </div>
         </div>
       </div>
+      {isSelected && (
+        <div className="absolute bottom-0 right-0 rounded-full border-2 border-primary p-2 mb-3 mr-3 text-primary">
+          {<FaRobot />}
+        </div>
+      )}
     </div>
   );
 };

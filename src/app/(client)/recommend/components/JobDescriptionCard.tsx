@@ -14,8 +14,8 @@ const JobDescriptionCard = ({
     company_name: string;
     company_url: string;
     location: string | null;
-    post_date: Date;
-    due_date: Date | null;
+    post_date: number;
+    due_date: number | null;
     fields: string;
     salary: string | null;
     experience: string | null;
@@ -25,6 +25,8 @@ const JobDescriptionCard = ({
     requirements: string;
   };
 }) => {
+  const post_date = new Date(data.post_date * 1000);
+  const due_date = new Date(data.due_date! * 1000);
   //Format strings
   const benefits = data.benefits ? removeBrackets(data.benefits) : '';
   const fields = data.fields ? removeBrackets(data.fields) : '';
@@ -86,7 +88,7 @@ const JobDescriptionCard = ({
 
             <div className="w-fit flex flex-row justify-between gap-1">
               <div className="flex-shrink-0">{AssetSvg.calendar()}</div>
-              <p className="min-w-[10ch]">{calculateDueTime(data.due_date!)}</p>
+              <p className="min-w-[10ch]">{calculateDueTime(due_date!)}</p>
             </div>
           </div>
         </div>

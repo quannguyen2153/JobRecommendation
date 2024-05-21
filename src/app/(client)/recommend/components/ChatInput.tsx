@@ -1,7 +1,9 @@
 'use client';
 
 import { useChat } from '@/hooks/useChat';
+import { PromptSuggestions } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { Button } from '@nextui-org/react';
 
 import { useMutation } from '@tanstack/react-query';
 import { CornerDownLeft, Loader2 } from 'lucide-react';
@@ -14,6 +16,7 @@ interface ChatInputProps extends HTMLAttributes<HTMLDivElement> {
   selectedJob: any;
   messages: Message[];
   setMessages: (messages: Message[]) => void;
+  isMessageUpdating: boolean;
   setIsMessageUpdating: (isUpdating: boolean) => void;
 }
 
@@ -22,6 +25,7 @@ const ChatInput: FC<ChatInputProps> = ({
   selectedJob,
   messages,
   setMessages,
+  isMessageUpdating,
   setIsMessageUpdating,
   ...props
 }) => {
@@ -83,8 +87,37 @@ const ChatInput: FC<ChatInputProps> = ({
     },
   });
 
+  // Helper function to shuffle an array of suggestions
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+  const randomSuggestions = shuffleArray([...PromptSuggestions]).slice(0, 2);
+
   return (
-    <div {...props} className={cn(className)}>
+    <div
+      {...props}
+      className={cn((className = `flex flex-col px-2 pb-3 gap-3`))}
+    >
+      <div className="w-full flex flex-row justify-start gap-3">
+        {!isMessageUpdating &&
+          randomSuggestions.map((suggestion) => (
+            <Button
+              variant="bordered"
+              key={suggestion}
+              onClick={() => {
+                sendMessage(suggestion);
+              }}
+              className="text-xs text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-0"
+            >
+              {suggestion}
+            </Button>
+          ))}
+      </div>
+
       <div className="relative w-full lex-1 overflow-hidden rounded-lg border-none outline-none">
         <TextareaAutosize
           ref={textareaRef}
