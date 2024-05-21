@@ -1,38 +1,65 @@
-from transformers import AutoTokenizer
-from ai_models.TextGenerator import TextGenerator
+from JobGPT import JobGPT
 
-from .config import API_URL, TOKEN
+from .config import GPT_MODEL_NAME, GPT_TOKEN
 
 class JobChatBot():
-    def __init__(self, text_generation_api_url, token):
-        self.text_generator = TextGenerator(api_url=text_generation_api_url, token=token)
-        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
+    def __init__(self, model):
+        self.model = model
         
-    def attachJob(self, job_dict):
-        self.job = job_dict        
-        self.job_requirements = self.job['requirements']
+    def attachJob(self, job_dict, topic=None):
+        self.job_dict = job_dict
+        self.topic = topic
         
-        tokens = self.tokenizer.tokenize(self.job_requirements)
-        self.job_requirements_tokens = len(tokens)
+        # Change the model's job text to the selected topic        
+        if self.topic is not None:
+            self.job_text = self.extractTopicFromJobDict(job_dict=self.job_dict, topic=self.topic)
+        else:                    
+            self.job_text = self.extractJobDictToText(job_dict=self.job_dict)
+        
+        self.model.attachJob(job_text=self.job_text, topic=self.topic)
+        
+    def extractTopicFromJobDict(self, job_dict, topic):
+        return job_dict[topic]
+        
+    def extractJobDictToText(self, job_dict):
+        extract_keys = ['job_title',
+                        'job_description',
+                        'benefits',
+                        'requirements']
+        
+        # Get necessary information
+        extracted_job_dict = {}
+        
+        for key in extract_keys:
+            extracted_job_dict[key] = job_dict[key]
+        
+        # Convert to text
+        job_text = ''
+        for key, value in extracted_job_dict.items():
+            job_text = job_text + key + ":\n" + str(value) + '\n'
+        
+        return job_text
         
     def attachCV(self, cv_dict):
-        self.cv = cv_dict        
-        self.cv_text = self.extractCVDictToText()
+        self.cv_dict = cv_dict        
+        self.cv_text = self.extractCVDictToText(cv_dict=self.cv_dict)
         
-        tokens = self.tokenizer.tokenize(self.cv_text)
-        self.cv_tokens = len(tokens)
+        self.model.attachCV(self.cv_text)
         
-    def extractCVDictToText(self):
-        extract_keys=[('Candidate\'s Profession', 'profession'),
-                      ('Candidate\'s Skills', 'skills'),
-                      ('Candidate\'s Experiences', 'experiences'),
-                      ('Candidate\'s Education', 'education'),
-                      ('Candidate\'s Certificates', 'certificates')]
+    def extractCVDictToText(self, cv_dict):
+        extract_keys=['Profession',
+                      'Skills',
+                      'Experiences',
+                      'Education',
+                      'Certificates']
+        
+        # Get necessary information
         extracted_cv_dict = {}
         
-        for dst_key, src_key in extract_keys:
-            extracted_cv_dict[dst_key] = self.cv[src_key]
-                
+        for key in extract_keys:
+            extracted_cv_dict[key] = cv_dict[key]
+        
+        # Convert to text     
         cv_text = ''
         for key, value in extracted_cv_dict.items():
             if value is None or '\n' not in value:
@@ -48,28 +75,16 @@ class JobChatBot():
         return cv_text
         
     def query(self, message):
-        info_message = 'Candidate\'s CV:\n' + self.cv_text + '\n---\nJob Requirements:\n' + self.job_requirements
-        request_message = info_message + '\n---\n' + message
-        
-        payload = {
-            "inputs": request_message,
-            "parameters": {
-                "max_new_tokens": self.job_requirements_tokens + self.cv_tokens,
-                "repetition_penalty": 1,
-                "return_full_text": False
-            }
-        }
-        
-        response = self.text_generator.query(payload=payload)
-
+        response = self.model.query(message=message)
         return response.strip()
 
     @staticmethod
     def send_message(job_dict, cv_dict, message):
         try:
-            chat_bot = JobChatBot(API_URL, TOKEN)
-            chat_bot.attachJob(job_dict)
-            chat_bot.attachCV(cv_dict)
+            jobgpt_model = JobGPT(model_name=GPT_MODEL_NAME, token=GPT_TOKEN)
+            chat_bot = JobChatBot(model=jobgpt_model)
+            chat_bot.attachJob(job_dict=job_dict, topic=None)
+            chat_bot.attachCV(cv_dict=cv_dict)
             return chat_bot.query(message)
         except Exception as e:
-            raise Exception('Chat error:' + str(e)) 
+            raise Exception('Chat error:' + str(e))
