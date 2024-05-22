@@ -59,10 +59,10 @@ export const Header = () => {
 
       <NavbarContent justify="center">
         <NavbarItem className="hidden lg:flex">
-          <Link href="/dashboard">Home</Link>
+          <Link href="/">Home</Link>
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">
-          <Link href="/">Opportuno</Link>
+          <Link href="/recommend">Recommendation</Link>
         </NavbarItem>
       </NavbarContent>
 
