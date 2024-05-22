@@ -4,7 +4,8 @@ from rest_framework.response import Response
 import json
 
 from .forms import *
-from .firebase import UserResourceManager, CVManager, AuthHelper, CVHelper, ChatBotHelper, JobHelper
+from .firebase import UserResourceManager
+from .helpers import AuthHelper, CVHelper, JobHelper, ChatBotHelper
 from .serializers import *
 from .authenticate import FirebaseAuthentication
 
@@ -138,7 +139,7 @@ class UserCVView(APIView):
 
   def get(self, request):
     try:
-      file_info = CVManager.get_cv_file_info(request.user.uid)
+      file_info = CVHelper.get_cv_file_info(request.user.uid)
     except Exception as e:
       return Response(
         data = {
@@ -212,25 +213,34 @@ class JobView(APIView):
   authentication_classes = [FirebaseAuthentication]
 
   def get(self, request):
-    request_data = request.query_params
-    form = GetJobsForm(data=request_data)
-    if not form.is_valid():
+    try:
+      request_data = request.query_params
+      form = GetJobsForm(data=request_data)
+      if not form.is_valid():
+        return Response(
+          data={
+            "success": False, 
+            "message": form.errors.as_data()
+          }, 
+          status=400
+        )
+      page = int(form.data.get('page', 1))
+      jobs, total = JobHelper.get_recommended_jobs(request.user.uid, page)
+      return Response(
+        status=200,
+        data={
+          "total": total,
+          "page": page,
+          "data": JobSerializer(jobs, many=True).data
+      })
+    except Exception as e:
       return Response(
         data={
           "success": False, 
-          "message": form.errors.as_data()
+          "message": str(e)
         }, 
-        status=400
+        status=500
       )
-    page = int(form.data.get('page', 1))
-    jobs, total = JobHelper.get_recommended_jobs(request.user.uid, page)
-    return Response(
-      status=200,
-      data={
-        "total": total,
-        "page": page,
-        "data": JobSerializer(jobs, many=True).data
-    })
 
 class ChatBotView(APIView):
   '''

@@ -1,7 +1,7 @@
 from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 
-from .firebase import AuthHelper
+from .helpers import AuthHelper
 
 class FirebaseAuthentication(BaseAuthentication):
   def authenticate(self, request):
