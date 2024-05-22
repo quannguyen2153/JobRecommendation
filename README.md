@@ -1,9 +1,9 @@
 Opportuno
 ============
----
+###
 This is an automated job search platform with AI features powered by NextJS, Django and Firebase.
 ---
-You can check the branches of the project for the features.
+### You can check the branches of the project for the features.
 
 ![Web Preview](./images/web.png)
 
