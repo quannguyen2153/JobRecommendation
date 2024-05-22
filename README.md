@@ -4,7 +4,7 @@ Opportuno
 
 This is a automated job search platform with AI features powered by NextJS, Django and Firebase.
 
-![Web Preview](src="./images/web_screen_1.png")
+![Web Preview](./images/web_screen_1.png)
 
 ---
 ## Contributor
@@ -72,13 +72,13 @@ Here is a working demo video :  [link](https://drive.google.com/file/d/1Gv-bPND4
 
 ## Site
 ### Dashboard page
-![](src="./images/dashboard.png")
+![](./images/dashboard.png)
 
 ### Recommendation page
-![](src="./images/web_screen_1.png")
-![](src="./images/web_screen_2.png")
+![](./images/web_screen_1.png)
+![](./images/web_screen_2.png)
 
 ### Architecture
-![](src="./images/architecture.png")
+![](./images/architecture.png)
 
 
