@@ -23,7 +23,7 @@ const Chat = ({ selectedJob }) => {
   }, [selectedJob]);
 
   return (
-    <div className="w-full h-[70%] z-0  flex flex-col rounded-lg bg-white justify-between">
+    <div className="w-full h-[70%] z-0  flex flex-col rounded-lg bg-white justify-between shadow-lg drop-shadow-lg">
       <div className="h-[80%] flex flex-col z-0">
         <ChatHeader></ChatHeader>
         <ChatMessages messages={messages}></ChatMessages>
