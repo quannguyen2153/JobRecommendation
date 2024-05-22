@@ -1,6 +1,6 @@
 from .JobGPT import JobGPT
 
-from .config import GPT_MODEL_NAME, GPT_TOKEN
+from config.config import GPT_MODEL_NAME, GPT_TOKEN
 
 class JobChatBot():
     def __init__(self, model):

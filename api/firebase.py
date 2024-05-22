@@ -1,7 +1,7 @@
 import pyrebase
 import requests
 
-from .config import FIREBASE_CONFIG, PAGE_SIZE
+from config.config import FIREBASE_CONFIG, JOB_PAGE_SIZE
 from .models import *
 from .serializers import *
 from .utils import generate_avatar, convert_size
@@ -272,6 +272,6 @@ class JobHelper:
     if page is None:
       return JobManager.get_jobs(recommended_job_ids), total
     else:
-      start = (page - 1) * PAGE_SIZE
-      end = page * PAGE_SIZE
+      start = (page - 1) * JOB_PAGE_SIZE
+      end = page * JOB_PAGE_SIZE
       return JobManager.get_jobs(recommended_job_ids[start:end]), total

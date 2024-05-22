@@ -4,7 +4,7 @@ import json
 import copy
 from io import BytesIO
 
-import ai_models.config as config
+import config.config as config
 from .CVParserGPT import CVParserGPT
 
 class CVParser():
