@@ -7,9 +7,8 @@ This is a automated job search platform with AI features powered by NextJS, Djan
 ![Web Preview](./images/web_screen_1.png)
 
 ---
-## Contributor
-
-
+## Contributors
+You can check the branches of the project for the features
 <table>
   <tr>
   <td align="center">
