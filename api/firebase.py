@@ -266,7 +266,8 @@ class JobHelper:
     Return: jobs in requested page, total number of jobs
     '''
     recommended_job_ids = JobRecommenderDataManager.get_recommendations(user_id)
-    
+    if recommended_job_ids is None:
+      raise Exception("No recommendations found. Please upload your CV first.")
     total = len(recommended_job_ids)
     if page is None:
       return JobManager.get_jobs(recommended_job_ids), total
