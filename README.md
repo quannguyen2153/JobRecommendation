@@ -86,15 +86,15 @@ npm run dev
 ```
 
 ---
-### Architecture
+## Architecture
 ![](./images/architecture.PNG)
 
 ---
 # Sites
-### Dashboard page
+## Dashboard page
 ![](./images/dashboard.PNG)
 
-### Recommendation page
+## Recommendation page
 ![](./images/web.png)
 
 
