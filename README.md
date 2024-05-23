@@ -66,11 +66,26 @@ You can check the branches of the project for more details about the features.
 - An AI assistant that helps explaining to user about a specific job
 
 ---
-## Demo
-Here is a working demo video: <a href="https://drive.google.com/file/d/1Gv-bPND4OWOBdq_bR9Ockyil7xJ_UIep/view?usp=drive_link" target="_blank">link</a>
+## Installation
+
+Clone the frontend branch from Github
+
+```sh
+git clone -b frontend --single-branch https://github.com/quannguyen2153/JobRecommendation.git
+```
+Install packages:
+
+```sh
+npm install
+```
+
+Run the application:
+
+```sh
+npm run dev
+```
 
 ---
-
 ### Architecture
 ![](./images/architecture.PNG)
 
@@ -80,6 +95,12 @@ Here is a working demo video: <a href="https://drive.google.com/file/d/1Gv-bPND4
 
 ### Recommendation page
 ![](./images/web.png)
+
+
+---
+## Demo
+Here is a working demo video: <a href="https://drive.google.com/file/d/1Gv-bPND4OWOBdq_bR9Ockyil7xJ_UIep/view?usp=drive_link" target="_blank">link</a>
+
 
 
 
