@@ -89,11 +89,11 @@ npm run dev
 ### Architecture
 ![](./images/architecture.PNG)
 
-## Site
-### Dashboard page
+### Site
+# Dashboard page
 ![](./images/dashboard.PNG)
 
-### Recommendation page
+# Recommendation page
 ![](./images/web.png)
 
 
