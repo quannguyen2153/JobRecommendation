@@ -101,8 +101,3 @@ npm run dev
 ---
 ## Demo
 Here is a working demo video: <a href="https://drive.google.com/file/d/1Gv-bPND4OWOBdq_bR9Ockyil7xJ_UIep/view?usp=drive_link" target="_blank">link</a>
-
-
-
-
-
